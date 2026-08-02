@@ -1,0 +1,313 @@
+{
+  "groups": {
+    "composerregistries": {
+      "description": "A Composer vendor namespace discovered on Packagist.",
+      "plural": "composerregistries",
+      "singular": "composerregistry",
+      "resources": {
+        "packages": {
+          "description": "A Composer package whose resource ID is its package basename within the vendor group.",
+          "plural": "packages",
+          "singular": "package",
+          "hasdocument": false,
+          "attributes": {
+            "type": {
+              "type": "string",
+              "description": "The package type (e.g., library, project, symfony-bundle)."
+            },
+            "license": {
+              "type": "array",
+              "item": {
+                "type": "string"
+              },
+              "description": "The license(s) under which the package is distributed. Composer RECOMMENDS SPDX license identifiers (e.g., MIT, Apache-2.0, GPL-3.0-or-later); multiple entries mean a disjunctive choice. Non-SPDX values occur in practice, notably 'proprietary' and 'LicenseRef-'-prefixed custom identifiers, and MUST be preserved verbatim."
+            },
+            "homepage": {
+              "type": "string",
+              "description": "The main homepage URL for the package."
+            },
+            "repository": {
+              "type": "string",
+              "description": "The VCS repository URL for the package."
+            },
+            "keywords": {
+              "type": "array",
+              "item": {
+                "type": "string"
+              },
+              "description": "Keywords that describe the package."
+            },
+            "authors": {
+              "type": "array",
+              "item": {
+                "type": "object",
+                "attributes": {
+                  "name": {
+                    "type": "string",
+                    "description": "Author name."
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Author email."
+                  },
+                  "homepage": {
+                    "type": "string",
+                    "description": "Author homepage."
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "Author role."
+                  }
+                }
+              },
+              "description": "Package authors."
+            },
+            "abandoned": {
+              "type": "any",
+              "description": "Composer abandoned status: false/true or the suggested replacement package name."
+            },
+            "suggest": {
+              "type": "map",
+              "item": {
+                "type": "string"
+              },
+              "description": "Optional packages recommended but not installed, keyed by package name. Values are free-text explanations, not version constraints."
+            },
+            "vendor": {
+              "type": "string",
+              "description": "The canonical Composer vendor and xRegistry group ID."
+            },
+            "packagepath": {
+              "type": "string",
+              "description": "The canonical vendor/package path on Packagist."
+            },
+            "version": {
+              "type": "string",
+              "description": "The normalized version string (e.g., 1.0.0, dev-main)."
+            },
+            "require": {
+              "type": "map",
+              "item": {
+                "type": "string"
+              },
+              "description": "Runtime dependencies, keyed by package name. Values are raw Composer version constraint expressions and MUST be preserved verbatim."
+            },
+            "require-dev": {
+              "type": "map",
+              "item": {
+                "type": "string"
+              },
+              "description": "Development-only dependencies, keyed by package name. Values are raw Composer version constraint expressions and MUST be preserved verbatim."
+            },
+            "conflict": {
+              "type": "map",
+              "item": {
+                "type": "string"
+              },
+              "description": "Conflicting packages, keyed by package name. Values are raw Composer version constraint expressions and MUST be preserved verbatim."
+            },
+            "replace": {
+              "type": "map",
+              "item": {
+                "type": "string"
+              },
+              "description": "Replaced packages, keyed by package name. Values are raw Composer version constraint expressions, or the literal 'self.version'."
+            },
+            "provide": {
+              "type": "map",
+              "item": {
+                "type": "string"
+              },
+              "description": "Virtual package names this package implements, keyed by package name. Values are raw Composer version constraint expressions."
+            },
+            "dist": {
+              "type": "object",
+              "attributes": {
+                "url": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "shasum": {
+                  "type": "string"
+                },
+                "reference": {
+                  "type": "string"
+                }
+              },
+              "description": "Distribution download information."
+            },
+            "source": {
+              "type": "object",
+              "attributes": {
+                "url": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "reference": {
+                  "type": "string"
+                }
+              },
+              "description": "Source VCS information. Unlike dist, source carries no checksum: a VCS checkout is identified by its reference, not by an archive digest."
+            },
+            "immutable": {
+              "type": "boolean",
+              "description": "True for stable tagged releases; false for dev-* branch aliases which are mutable."
+            },
+            "autoload": {
+              "type": "any",
+              "description": "Autoload rules in the upstream Composer representation. Genuinely union-typed: PSR-4 and PSR-0 entries map a prefix to a string or an array of strings, while classmap and files are arrays."
+            },
+            "autoload-dev": {
+              "type": "any",
+              "description": "Development-only autoload rules, structured identically to autoload and applied only when developing this package."
+            },
+            "bin": {
+              "type": "array",
+              "item": {
+                "type": "string"
+              },
+              "description": "Executable scripts, as package-relative paths, that Composer links into the vendor binary directory."
+            },
+            "scripts": {
+              "type": "any",
+              "description": "Composer event hooks, keyed by event name. Genuinely union-typed: a value is either a single callable/command string or an array of them."
+            },
+            "support": {
+              "type": "object",
+              "attributes": {
+                "email": {
+                  "type": "string",
+                  "description": "Support email address."
+                },
+                "issues": {
+                  "type": "string",
+                  "description": "Issue tracker URL."
+                },
+                "forum": {
+                  "type": "string",
+                  "description": "Support forum URL."
+                },
+                "wiki": {
+                  "type": "string",
+                  "description": "Wiki URL."
+                },
+                "irc": {
+                  "type": "string",
+                  "description": "IRC channel, as an irc:// URL."
+                },
+                "chat": {
+                  "type": "string",
+                  "description": "Chat channel URL."
+                },
+                "source": {
+                  "type": "string",
+                  "description": "URL for browsing or downloading the sources."
+                },
+                "docs": {
+                  "type": "string",
+                  "description": "Documentation URL."
+                },
+                "rss": {
+                  "type": "string",
+                  "description": "RSS feed URL."
+                },
+                "security": {
+                  "type": "string",
+                  "description": "Security policy disclosure URL."
+                }
+              },
+              "description": "Support channels published by the package."
+            },
+            "funding": {
+              "type": "array",
+              "item": {
+                "type": "object",
+                "attributes": {
+                  "type": {
+                    "type": "string",
+                    "description": "Funding channel kind, e.g. github, patreon, tidelift, other."
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "Funding URL."
+                  }
+                }
+              },
+              "description": "Ways to fund the maintenance of the package."
+            },
+            "extra": {
+              "type": "any",
+              "description": "Arbitrary Composer extra data for this version."
+            },
+            "time": {
+              "type": "timestamp",
+              "description": "Release timestamp for this version in RFC3339 format."
+            },
+            "versionnormalized": {
+              "type": "string",
+              "description": "The Composer-normalized version string."
+            },
+            "sourcereference": {
+              "type": "string",
+              "description": "The VCS reference (commit SHA or branch) this version was built from. Critical for dev-* mutable aliases."
+            }
+          },
+          "maxversions": 0,
+          "setversionid": true,
+          "versionmode": "createdat",
+          "singleversionroot": true,
+          "metaattributes": {
+            "defaultversionsticky": {
+              "type": "boolean",
+              "description": "Sticky default Versions are not supported: the default Version is always the newest published release.",
+              "enum": [ false ],
+              "required": true,
+              "default": false
+            },
+            "downloads": {
+              "type": "object",
+              "attributes": {
+                "total": {
+                  "type": "uinteger"
+                },
+                "monthly": {
+                  "type": "uinteger"
+                },
+                "daily": {
+                  "type": "uinteger"
+                }
+              },
+              "description": "Download statistics (total, monthly, daily)."
+            },
+            "favers": {
+              "type": "uinteger",
+              "description": "Number of users who have starred/favorited the package."
+            },
+            "currentversion": {
+              "type": "string",
+              "description": "The raw Composer version selected for display on the Resource."
+            },
+            "readme": {
+              "type": "string",
+              "description": "The rendered package README as published by Packagist. Package-wide, not per-Version."
+            },
+            "default-branch": {
+              "type": "string",
+              "description": "The VCS branch Packagist treats as the package default, e.g. main or master. Package-wide, not per-Version."
+            }
+          }
+        }
+      },
+      "attributes": {
+        "vendor": {
+          "type": "string",
+          "description": "Canonical Composer vendor and xRegistry group ID."
+        }
+      }
+    }
+  }
+}

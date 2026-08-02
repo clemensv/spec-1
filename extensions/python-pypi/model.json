@@ -1,0 +1,246 @@
+{
+  "description": "The xRegistry model for the PyPI wrapper, describing the structure and metadata for Python package registries and packages.",
+  "groups": {
+    "pythonregistries": {
+      "description": "A group representing a Python package registry provider (e.g., pypi.org). Contains all available Python package registries.",
+      "plural": "pythonregistries",
+      "singular": "pythonregistry",
+      "resources": {
+        "packages": {
+          "description": "A resource representing a Python package in the registry, including its metadata and available versions.",
+          "plural": "packages",
+          "singular": "package",
+          "hasdocument": false,
+          "attributes": {
+            "summary": {
+              "type": "string",
+              "description": "A short summary or tagline describing the package."
+            },
+            "license": {
+              "type": "string",
+              "description": "The legacy 'License' Core Metadata field. Deprecated by Core Metadata 2.4 in favour of 'license_expression'; the two are mutually exclusive."
+            },
+            "license_expression": {
+              "type": "string",
+              "description": "The 'License-Expression' Core Metadata 2.4 field: a valid SPDX license expression. Mutually exclusive with 'license'."
+            },
+            "license_files": {
+              "type": "array",
+              "item": {
+                "type": "string"
+              },
+              "description": "The 'License-File' Core Metadata 2.4 fields: paths to license files included in the distribution."
+            },
+            "author": {
+              "type": "string",
+              "description": "The 'Author' Core Metadata field. Frequently absent in modern projects, which carry the author's name inside 'author_email' instead."
+            },
+            "author_email": {
+              "type": "string",
+              "description": "The 'Author-email' Core Metadata field. May be a bare address or one or more RFC 5322 name-address pairs such as '\"A. Author\" <a@example.com>', in which case the name is carried here rather than in 'author'."
+            },
+            "maintainer": {
+              "type": "string",
+              "description": "The maintainer of the package."
+            },
+            "maintainer_email": {
+              "type": "string",
+              "description": "The email of the package maintainer."
+            },
+            "home_page": {
+              "type": "url",
+              "description": "The main homepage URL for the package."
+            },
+            "project_url": {
+              "type": "url",
+              "description": "The main project URL or repository for the package."
+            },
+            "project_urls": {
+              "type": "map",
+              "item": {
+                "type": "string"
+              },
+              "description": "Map of additional project URLs, keyed by label."
+            },
+            "keywords": {
+              "type": "string",
+              "description": "The 'Keywords' Core Metadata field, as served by the API: a single comma-separated string."
+            },
+            "description_content_type": {
+              "type": "string",
+              "description": "The content type of the description (e.g., text/markdown)."
+            },
+            "requires_dist": {
+              "type": "array",
+              "item": {
+                "type": "object",
+                "attributes": {
+                  "specifier": {
+                    "type": "string",
+                    "description": "Original dependency specifier string following PEP 508 format."
+                  },
+                  "package": {
+                    "type": "xid",
+                    "description": "XID reference to the package in this registry.",
+                    "target": "/pythonregistries/packages"
+                  }
+                }
+              },
+              "description": "A list of package dependencies required for installation with cross-references."
+            },
+            "requires_python": {
+              "type": "string",
+              "description": "The Python version requirement for this package."
+            },
+            "classifiers": {
+              "type": "array",
+              "item": {
+                "type": "string"
+              },
+              "description": "List of classifiers categorizing the package."
+            },
+            "provides_extra": {
+              "type": "array",
+              "item": {
+                "type": "string"
+              },
+              "description": "List of optional feature names provided by this package."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The 'platform' field as served by the PyPI JSON API, which flattens the multi-use 'Platform' Core Metadata field into a single string. It projects the API field, not the metadata field, and is therefore typed 'string' rather than an array."
+            },
+            "dynamic": {
+              "type": "array",
+              "item": {
+                "type": "string"
+              },
+              "description": "List of fields that were dynamically computed at build time."
+            },
+            "urls": {
+              "type": "array",
+              "item": {
+                "type": "object",
+                "attributes": {
+                  "filename": {
+                    "type": "string"
+                  },
+                  "packagetype": {
+                    "type": "string",
+                    "description": "The distribution format of this file, as reported by the index.",
+                    "enum": [
+                      "sdist",
+                      "bdist_wheel",
+                      "bdist_egg",
+                      "bdist_wininst",
+                      "bdist_msi",
+                      "bdist_dumb",
+                      "bdist_rpm"
+                    ],
+                    "strict": false
+                  },
+                  "python_version": {
+                    "type": "string"
+                  },
+                  "requires_python": {
+                    "type": "string",
+                    "description": "The Requires-Python constraint for this individual distribution file, which MAY differ between files of the same version."
+                  },
+                  "size": {
+                    "type": "uinteger"
+                  },
+                  "upload_time": {
+                    "type": "string"
+                  },
+                  "upload_time_iso_8601": {
+                    "type": "timestamp"
+                  },
+                  "url": {
+                    "type": "url"
+                  },
+                  "yanked": {
+                    "type": "boolean",
+                    "description": "Whether this individual distribution file has been yanked (PEP 592)."
+                  },
+                  "yanked_reason": {
+                    "type": "string",
+                    "description": "Reason reported for yanking this individual distribution file."
+                  },
+                  "core_metadata": {
+                    "type": "any",
+                    "description": "Projects the 'core-metadata' key served by the PyPI JSON API for this file, declaring PEP 658/714 availability of the distribution's metadata as a separate fetch: either the boolean true or a map of hash name to hash value. Allows a client to obtain the metadata without downloading the artifact."
+                  },
+                  "digests": {
+                    "type": "object",
+                    "attributes": {
+                      "blake2b_256": {
+                        "type": "string"
+                      },
+                      "md5": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "description": "A list of downloadable distribution files and their metadata for the package version."
+            },
+            "vulnerabilities": {
+              "type": "array",
+              "item": {
+                "type": "object",
+                "attributes": {
+                  "aliases": {
+                    "type": "array",
+                    "item": {
+                      "type": "string"
+                    }
+                  },
+                  "details": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "fixed_in": {
+                    "type": "array",
+                    "item": {
+                      "type": "string"
+                    }
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "link": {
+                    "type": "url"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "withdrawn": {
+                    "type": "timestamp"
+                  }
+                }
+              },
+              "description": "List of known security vulnerabilities for this package."
+            },
+            "replacedby": {
+              "type": "xid",
+              "description": "Cross-reference to the package that supersedes this one, when the index or publisher has identified a replacement.",
+              "target": "/pythonregistries/packages"
+            }
+          },
+          "metaattributes": {
+            "organization": {
+              "type": "string",
+              "description": "The PyPI Organization account that owns the project, when the project belongs to one. Organization accounts are opt-in (subscription-based for corporate organizations, free for community projects), so most projects have no organization. Project names are flat and globally unique on PyPI after PEP 503 normalisation regardless of organization, so this attribute is provenance metadata and is not part of the project's identity."
+            }
+          }
+        }
+      }
+    }
+  }
+}
