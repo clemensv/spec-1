@@ -3,6 +3,12 @@
   "groups": {
     "containerregistries": {
       "description": "A group representing an OCI container registry provider (e.g., Docker Hub, GHCR). Contains all available container registries.",
+      "attributes": {
+        "sourceurl": {
+          "type": "url",
+          "description": "Base URL of the OCI Distribution API from which these images were projected, e.g. 'https://registry-1.docker.io/v2/'. This records provenance only; a repository name denotes the same repository whichever registry serves it."
+        }
+      },
       "plural": "containerregistries",
       "singular": "containerregistry",
       "resources": {
@@ -14,6 +20,11 @@
           "setversionid": true,
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The complete OCI repository name, verbatim and unaltered, including its '/' separators (e.g. 'library/nginx'). This is the authoritative name of the image; the imageid is only an addressing key derived from it and MUST NOT be reversed to recover this value."
+            },
             "metadata": {
               "type": "object",
               "description": "Comprehensive metadata about the container image.",
@@ -428,9 +439,9 @@
             }
           },
           "metaattributes": {
-            "registry": {
-              "type": "string",
-              "description": "The registry URL where this repository is hosted."
+            "sourceurl": {
+              "type": "url",
+              "description": "Base URL of the OCI Distribution API this image was actually fetched from, e.g. 'https://registry-1.docker.io/v2/'. For a mirrored image this is the mirror rather than the registry named in the reference. This records provenance only and is not part of the image's identity."
             },
             "namespace": {
               "type": "string",

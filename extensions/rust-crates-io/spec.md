@@ -1,4 +1,9 @@
 # Rust Crate Registry Mapping - Version 1.0-rc1
+<!-- words: backported cfg cksum crateid cratelinks cratescount cratesurl -->
+<!-- words: curated deps homepage hypermedia lockfiles msrv namespace -->
+<!-- words: namespaces readme rustregistries rustregistriescount -->
+<!-- words: rustregistriesurl rustregistry rustregistryid serde sourceurl -->
+<!-- words: spdx sys toml trustpub unyank unyanked vendored -->
 
 ## Abstract
 
@@ -17,6 +22,7 @@ terms of the xRegistry document format and API [specification][xRegistry Core].
 - [3. Registry Model](#3-registry-model)
 - [4. Identity Mapping](#4-identity-mapping)
   - [4.1. Group Identity](#41-group-identity)
+    - [4.1.1. Projection Identity Rules](#411-projection-identity-rules)
   - [4.2. Resource Identity](#42-resource-identity)
   - [4.3. Version Identity](#43-version-identity)
   - [4.4. Timestamps](#44-timestamps)
@@ -126,7 +132,7 @@ this form:
   "rustregistriesurl": "<URL>",
   "rustregistriescount": <UINTEGER>,
   "rustregistries": {
-    "<KEY>": {                                  # rustregistryid, e.g. crates.io
+    "<KEY>": {                                  # rustregistryid, e.g. crates-io
       "rustregistryid": "<STRING>",             # xRegistry core attributes
       "self": "<URL>",
       "shortself": "<URL>", ?
@@ -138,6 +144,8 @@ this form:
       "labels": { "<STRING>": "<STRING>" * }, ?
       "createdat": "<TIMESTAMP>",
       "modifiedat": "<TIMESTAMP>",
+
+      "sourceurl": "<URL>", ?                  # index URL of this registry
 
       "cratesurl": "<URL>",
       "cratescount": <UINTEGER>,
@@ -228,7 +236,46 @@ this form:
 
 ### 4.1. Group Identity
 
-The `rustregistryid` MUST identify the crate registry, for example `crates.io`.
+A Group is one **projection** of an ecosystem's package metadata into
+xRegistry. The `rustregistryid` names that projection. For crates projected from
+the crates.io index and API model the `rustregistryid` MUST be `crates-io`.
+
+The identifier is deliberately not a registry deployment, a host or an account.
+A registry that serves crates from the public service, from a mirror, from a
+vendored index or from an alternate registry that follows the same index format
+uses the same `crates-io` Group, so that
+`/rustregistries/crates-io/crates/<crateid>` denotes the same crate wherever it
+is served.
+
+See [Section 4.1.1](#411-projection-identity-rules) for the rules that govern
+this identifier.
+
+#### 4.1.1. Projection Identity Rules
+
+- The identifier MUST be stable across every deployment that serves the same
+  projection, and MUST NOT vary by serving host, tenancy or access level. An
+  implementation MUST NOT derive it from a DNS name, a URL authority or an
+  account name. This is what allows one registry to shadow another: a crate
+  served from an air-gapped mirror MUST present the same path as the same crate
+  served from the public service.
+- Where the Rust ecosystem introduces an index or metadata model that cannot be
+  projected into the attributes defined in this specification without loss or
+  contradiction, that model MUST be given a new Group identifier, for example
+  `crates-io-v2`. Both Groups MAY then coexist in one registry, and a client
+  selects the model it understands instead of being handed attributes whose
+  meaning has silently changed.
+- Where two parties project this ecosystem under incompatible interpretations,
+  each MUST use a distinct Group identifier. A Group therefore identifies the
+  ecosystem together with the reading of it that produced the entries, and two
+  entries in the same Group are directly comparable.
+
+Access control is a property of the registry deployment rather than of the
+identifier. A registry that exposes only an alternate registry's crates still
+exposes them under `crates-io` when they follow that index model, and MAY omit
+entries the caller is not entitled to see; a caller MUST NOT infer from an
+entry's absence that it does not exist upstream. Where entries drawn from
+different services are served together, the `sourceurl` attribute records which
+service each Group's entries were projected from.
 
 ### 4.2. Resource Identity
 
@@ -277,11 +324,17 @@ either level, and implementations MUST NOT introduce one.
 ## 5. Group: `rustregistry`
 
 The Group (`<GROUP>`) name is `rustregistry` (singular); the plural, used as the
-collection name, is `rustregistries`. A `rustregistry` represents one Rust crate
-registry provider.
+collection name, is `rustregistries`. A `rustregistry` represents one
+projection of the crates.io metadata model into xRegistry. Its identifier names
+that projection rather than the service that serves it. See
+[Section 4.1](#41-group-identity) for how the identifier is formed.
 
-This extension defines no Group-level extension attributes beyond those
-inherited from [xRegistry Core][xRegistry Core].
+This extension defines the following Group-level extension attributes, in
+addition to those inherited from [xRegistry Core][xRegistry Core]:
+
+| xRegistry attribute | Type | Description |
+|---|---|---|
+| `sourceurl` | `url` | Base URL of the index these crates were projected from, for example `https://index.crates.io`. Provenance only. |
 
 ## 6. Resource: `crate`
 
@@ -320,7 +373,7 @@ the expression itself and MUST NOT be discarded by splitting it.
 object returned by `GET /api/v1/crates/<name>`; it appears only on version
 objects and in the manifest. A crate MAY legitimately have neither `license` nor
 `license_file` — crates.io does not require licensing metadata — and
-implementations MUST NOT synthesise a value when both are absent.
+implementations MUST NOT synthesize a value when both are absent.
 
 The `lib_links` attribute carries Cargo's `package.links` manifest key, which
 declares the native library a `-sys` crate links against. It is deliberately
@@ -361,7 +414,7 @@ An implementation MUST NOT populate `default_version` by computing it from
 `max_version`, `max_stable_version` or `newest_version`, and MUST NOT populate
 any of those three from `default_version`. Where the upstream registry does not
 supply a deprecated pointer, the corresponding attribute MUST be omitted rather
-than synthesised. The four values are independent: `newest_version` reflects
+than synthesized. The four values are independent: `newest_version` reflects
 publication order, `max_version` SemVer precedence, `max_stable_version` SemVer
 precedence over stable releases only, and `default_version` additionally
 excludes yanked versions. A backported patch to an older release line, or a yank

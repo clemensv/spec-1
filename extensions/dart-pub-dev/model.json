@@ -5,6 +5,12 @@
       "description": "A group representing a Dart/Flutter package registry provider (e.g., pub.dev). Contains all available Dart package registries.",
       "plural": "dartregistries",
       "singular": "dartregistry",
+      "attributes": {
+        "sourceurl": {
+          "type": "url",
+          "description": "Base URL of the pub server from which these packages were projected, e.g. 'https://pub.dev'. This records provenance only; a package name denotes the same package whichever server serves it."
+        }
+      },
       "resources": {
         "packages": {
           "description": "A resource representing a Dart/Flutter package in the registry, including its metadata and available versions.",
@@ -12,6 +18,11 @@
           "singular": "package",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The package name exactly as declared by the pubspec 'name' field. This is the authoritative name of the package; the packageid is only an addressing key derived from it."
+            },
             "homepage": {
               "type": "string",
               "description": "The main homepage URL for the package."

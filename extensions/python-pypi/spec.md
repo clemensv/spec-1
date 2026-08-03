@@ -1,4 +1,9 @@
 # PyPI Package Registry Mapping - Version 1.0-rc1
+<!-- words: abi bdist cve homepage lowercased metaattribute msi osv -->
+<!-- words: packageid packagescount packagesurl packagetype pypi pyproject -->
+<!-- words: pysec pythonregistries pythonregistriescount -->
+<!-- words: pythonregistriesurl pythonregistry pythonregistryid replacedby -->
+<!-- words: sdist sourced sourceurl spdx toml trustpub ubuntu wininst -->
 
 ## Abstract
 
@@ -18,6 +23,7 @@ PyPI JSON API, in terms of the xRegistry document format and API
 - [3. Registry Model](#3-registry-model)
 - [4. Identity Mapping](#4-identity-mapping)
   - [4.1. Group Identity](#41-group-identity)
+    - [4.1.1. Projection Identity Rules](#411-projection-identity-rules)
   - [4.2. Resource Identity](#42-resource-identity)
   - [4.3. Version Identity](#43-version-identity)
   - [4.4. Timestamps](#44-timestamps)
@@ -112,7 +118,7 @@ to this form:
   "pythonregistriesurl": "<URL>",
   "pythonregistriescount": <UINTEGER>,
   "pythonregistries": {
-    "<KEY>": {                                  # pythonregistryid, e.g. pypi.org
+    "<KEY>": {                                  # pythonregistryid, e.g. pypi
       "pythonregistryid": "<STRING>",           # xRegistry core attributes
       "self": "<URL>",
       "shortself": "<URL>", ?
@@ -124,6 +130,8 @@ to this form:
       "labels": { "<STRING>": "<STRING>" * }, ?
       "createdat": "<TIMESTAMP>",
       "modifiedat": "<TIMESTAMP>",
+
+      "sourceurl": "<URL>", ?                  # Simple API root of this index
 
       "packagesurl": "<URL>",
       "packagescount": <UINTEGER>,
@@ -185,6 +193,7 @@ to this form:
               "yanked": <BOOLEAN>, ?            # PEP 592 is per-file; see 6.2
               "yanked_reason": "<STRING>", ?
               "core_metadata": <ANY>, ?         # PEP 658/714
+              "provenance": "<URL>", ?          # PEP 740
               "digests": {
                 "sha256": "<STRING>", ?
                 "md5": "<STRING>", ?
@@ -225,8 +234,45 @@ to this form:
 
 ### 4.1. Group Identity
 
-The `pythonregistryid` MUST be the DNS name of the index that serves the
-metadata, for example `pypi.org`.
+A Group is one **projection** of an ecosystem's package metadata into
+xRegistry. The `pythonregistryid` names that projection. For projects projected
+from the PyPI metadata model the `pythonregistryid` MUST be `pypi`.
+
+The identifier is deliberately not an index, a host or an account. A registry
+that serves Python projects from the public index, from a mirror, from an
+internal proxy or from a private index uses the same `pypi` Group, so that
+`/pythonregistries/pypi/packages/<packageid>` denotes the same project wherever
+it is served.
+
+See [Section 4.1.1](#411-projection-identity-rules) for the rules that govern
+this identifier.
+
+#### 4.1.1. Projection Identity Rules
+
+- The identifier MUST be stable across every deployment that serves the same
+  projection, and MUST NOT vary by serving host, tenancy or access level. An
+  implementation MUST NOT derive it from a DNS name, a URL authority or an
+  account name. This is what allows one registry to shadow another: a project
+  served from an air-gapped mirror MUST present the same path as the same
+  project served from the public index.
+- Where the Python packaging ecosystem introduces a metadata model that cannot
+  be projected into the attributes defined in this specification without loss
+  or contradiction, that model MUST be given a new Group identifier, for
+  example `pypi-v2`. Both Groups MAY then coexist in one registry, and a client
+  selects the model it understands instead of being handed attributes whose
+  meaning has silently changed.
+- Where two parties project this ecosystem under incompatible interpretations,
+  each MUST use a distinct Group identifier. A Group therefore identifies the
+  ecosystem together with the reading of it that produced the entries, and two
+  entries in the same Group are directly comparable.
+
+Access control is a property of the registry deployment rather than of the
+identifier. A registry that exposes only a private index's projects still
+exposes them under `pypi`, and MAY omit entries the caller is not entitled to
+see; a caller MUST NOT infer from an entry's absence that it does not exist
+upstream. Where entries drawn from different indexes are served together, the
+`sourceurl` attribute records which service each Group's entries were projected
+from.
 
 ### 4.2. Resource Identity
 
@@ -276,10 +322,16 @@ in yank status.
 
 The Group (`<GROUP>`) name is `pythonregistry` (singular); the plural, used as
 the collection name, is `pythonregistries`. A `pythonregistry` represents one
-Python package index provider.
+projection of the PyPI metadata model into xRegistry. Its identifier names that
+projection rather than the service that serves it. See
+[Section 4.1](#41-group-identity) for how the identifier is formed.
 
-This extension defines no Group-level extension attributes beyond those
-inherited from [xRegistry Core][xRegistry Core].
+This extension defines the following Group-level extension attributes, in
+addition to those inherited from [xRegistry Core][xRegistry Core]:
+
+| xRegistry attribute | Type | Description |
+|---|---|---|
+| `sourceurl` | `url` | Base URL of the index these projects were projected from, for example `https://pypi.org/simple/`. Provenance only. |
 
 ## 6. Resource: `package`
 
@@ -364,6 +416,7 @@ following shape:
   "yanked": BOOLEAN ?,
   "yanked_reason": "STRING" ?,
   "core_metadata": ANY ?,
+  "provenance": "URL" ?,               # PEP 740 attestations
   "digests": {
     "sha256": "STRING",
     "md5": "STRING" ?,
@@ -402,6 +455,32 @@ map of hash names to values, so it is typed `any` and preserved verbatim; when
 it is a map, a client MUST verify the fetched metadata against the given
 digest.
 
+`urls[].provenance` projects the `provenance` key that [PEP 740][PEP 740] adds
+to each file entry of the JSON Simple API at `api-version` 1.3 or later. Its
+value is the URL of a *provenance object*, a JSON document holding the digital
+attestations published with that artifact, each bundled under the Trusted
+Publishing identity that signed it. Attestations are per file, not per release,
+which is why this attribute sits on `urls` and not on the Version.
+
+The provenance object is deliberately **not** embedded. PEP 740 itself declined
+to inline it into the Simple API on size grounds, and the same reasoning applies
+here: a release commonly has around twenty files, and a fully inlined project
+would grow by hundreds of kilobytes of signature material that almost no reader
+needs. An implementation MUST therefore carry the URL and MUST NOT substitute a
+summary of the attestations for it, since a summary cannot be verified.
+
+An index that serves `null` for `provenance` is stating that the file has no
+attestations. That is not the same as the index not implementing PEP 740 at all,
+but neither case is a fact worth recording, so an implementation MUST omit the
+attribute in both. A consumer MUST NOT infer from an absent `provenance` that
+the artifact is unsigned; it MUST treat the attestation status as unknown.
+
+PyPI exposes no project-level Trusted Publishing flag, so this specification
+defines none. Trusted Publishing on PyPI is publisher configuration rather than
+published project metadata, and it is not served by any index API; the only
+evidence of it that reaches a consumer is the publisher identity recorded inside
+a provenance object. This is a deliberate asymmetry with the crates.io mapping,
+whose `trustpub_only` attribute exists because crates.io does serve that flag.
 `packagetype` reports the distribution format. `sdist` and `bdist_wheel` account
 for essentially all current uploads, but PyPI continues to serve historical
 artifacts recorded as `bdist_egg`, `bdist_wininst`, `bdist_msi`, `bdist_dumb`
@@ -495,5 +574,6 @@ MAY omit any attribute for which the upstream index supplies no value.
 [PEP 592]: https://peps.python.org/pep-0592/
 [PEP 658]: https://peps.python.org/pep-0658/
 [PEP 714]: https://peps.python.org/pep-0714/
+[PEP 740]: https://peps.python.org/pep-0740/
 [wheel]: https://packaging.python.org/en/latest/specifications/binary-distribution-format/
 [OSV]: https://osv.dev/

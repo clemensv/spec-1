@@ -1,4 +1,13 @@
 # Hugging Face Hub Mapping - Version 1.0-rc1
+<!-- words: blobid carddata datasetid datasetscount datasetsurl dtype gpu -->
+<!-- words: gradio huggingface huggingfaceregistries -->
+<!-- words: huggingfaceregistriescount huggingfaceregistriesurl -->
+<!-- words: huggingfaceregistry huggingfaceregistryid lastmodified lfs -->
+<!-- words: modelid modelscount modelsurl namespace namespaces openai -->
+<!-- words: paperswithcode pointersize rajpurkar repoid rfilename -->
+<!-- words: safetensors sdk shas spaceid spacescount spacesurl streamlit -->
+<!-- words: subdomain targetcommit transformersinfo unnamespaced -->
+<!-- words: usedstorage widgetdata xh -->
 
 ## Abstract
 
@@ -398,6 +407,7 @@ All three Resource types share the following attributes:
 
 | xRegistry attribute | Hub field | Type | Description |
 |---|---|---|---|
+| `name` | `id` | `string` | REQUIRED. The full Hub repository identity in `owner/name` form, verbatim. Authoritative; the Resource ID is only the basename and does not identify the repository on its own. |
 | `repoid` | `id` (models also repeat it as `modelId`) | `string` | The full Hub repository ID, `owner/name` or the bare name. |
 | `repository` | derived | `string` | The canonical `owner/repository` identity, or the bare ID for an unnamespaced repository. |
 | `namespace` | derived | `string` | The canonical owner namespace, or the empty string for an unnamespaced repository. |

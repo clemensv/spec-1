@@ -1,4 +1,9 @@
 # OCI Container Registry Mapping - Version 1.0-rc1
+<!-- words: artifacttype containerregistries containerregistriescount -->
+<!-- words: containerregistriesurl containerregistry containerregistryid -->
+<!-- words: dockerhub entrypoint ghcr goarch imageid imagescount imagesurl -->
+<!-- words: linux mcr mediatype namespace nuget opencontainers punycode -->
+<!-- words: pypi repoints rootfs sbom sboms sigterm sourceurl xh -->
 
 ## Abstract
 
@@ -17,6 +22,7 @@ xRegistry document format and API [specification][xRegistry Core].
 - [3. Registry Model](#3-registry-model)
 - [4. Identity Mapping](#4-identity-mapping)
   - [4.1. Group Identity](#41-group-identity)
+  - [4.1.1. Registry Identity Rules](#411-registry-identity-rules)
   - [4.2. Resource Identity](#42-resource-identity)
   - [4.3. Version Identity](#43-version-identity)
   - [4.4. Timestamps](#44-timestamps)
@@ -123,7 +129,7 @@ adheres to this form:
   "containerregistriesurl": "<URL>",
   "containerregistriescount": <UINTEGER>,
   "containerregistries": {
-    "<KEY>": {                                  # containerregistryid, ghcr
+    "<KEY>": {                                  # containerregistryid, ghcr.io
       "containerregistryid": "<STRING>",        # xRegistry core attributes
       "self": "<URL>",
       "shortself": "<URL>", ?
@@ -135,6 +141,8 @@ adheres to this form:
       "labels": { "<STRING>": "<STRING>" * }, ?
       "createdat": "<TIMESTAMP>",
       "modifiedat": "<TIMESTAMP>",
+
+      "sourceurl": "<URL>", ?                  # Distribution API root
 
       "imagesurl": "<URL>",
       "imagescount": <UINTEGER>,
@@ -148,7 +156,7 @@ adheres to this form:
 
           # Start of default Version's attributes
           "epoch": <UINTEGER>,
-          "name": "<STRING>", ?                 # canonical image name
+          "name": "<STRING>",                   # full repository name, see 4.2
           "description": "<STRING>", ?
           "documentation": "<URL>", ?
           "labels": { "<STRING>": "<STRING>" * }, ?
@@ -268,7 +276,7 @@ adheres to this form:
 
           "metaurl": "<URL>",
           "meta": {                             # see 6.8
-            "registry": "<STRING>", ?           # base URL of the registry
+            "sourceurl": "<URL>", ?            # base URL actually fetched from
             "namespace": "<STRING>", ?          # org component of the repo name
             "repository": "<STRING>", ?         # repo component of the repo name
             "deprecated_message": "<STRING>", ? # registry-proprietary
@@ -290,12 +298,62 @@ adheres to this form:
 
 ### 4.1. Group Identity
 
-The `containerregistryid` MUST identify the registry endpoint, for example
-`dockerhub` or `ghcr`. The registry's base URL MUST be recorded in the
-`registry` meta attribute of contained Resources.
+A Group is the **registry component of an image reference**. The
+`containerregistryid` MUST be the lowercase registry name exactly as it appears
+in the prefix of a fully qualified image reference — `docker.io`, `ghcr.io`,
+`quay.io`, `mcr.microsoft.com`, or `registry.contoso.example` for a private
+registry.
 
-A single deployment MAY expose several Groups when it fronts several registry
-endpoints.
+This extension differs from the package-registry extensions in this respect, and
+the difference is not accidental. A NuGet package ID or a PyPI project name is a
+global name that denotes the same artifact whoever serves it, so those Groups
+name a projection rather than a host. An OCI repository name is not global: it
+is only meaningful relative to a registry, and `library/nginx` on two registries
+is two unrelated repositories. The registry name is therefore part of the
+artifact's own identity rather than an address at which it happens to be served,
+and it belongs in the identity path.
+
+A short label such as `dockerhub` or `ghcr` MUST NOT be used, because it is not
+the name by which the registry is addressed and two deployments would be free to
+choose different labels for the same registry.
+
+See [Section 4.1.1](#411-registry-identity-rules) for the rules that govern this
+identifier.
+
+#### 4.1.1. Registry Identity Rules
+
+- The name MUST be recorded in its lowercase form, and an internationalized
+  name MUST be recorded as its A-label (Punycode) form, because an Entity ID
+  is restricted to ASCII and is compared case-insensitively for uniqueness.
+- A non-default port, where one is part of the registry name, MUST be appended
+  as `:<port>`. `:` is a valid Entity ID character.
+- The identifier is the name used in image references, not necessarily the host
+  that serves the Distribution API. `docker.io` is the name for an API served
+  at `registry-1.docker.io`. The API root SHOULD be recorded in the Group's
+  `sourceurl` attribute as provenance, and MUST NOT be reconstructed from the
+  identifier.
+- The legacy alias `index.docker.io` and the bare form implied by an unqualified
+  reference such as `nginx` MUST both be recorded as `docker.io`, which is the
+  canonical name.
+- A mirror or pull-through cache that re-serves another registry's images MUST
+  record them under the Group of the registry named in the image reference, not
+  under its own name. A cache serving `docker.io/library/nginx` presents it at
+  `/containerregistries/docker.io/images/library~nginx`, so that a registry
+  fronting the cache and a registry fronting Docker Hub produce the same path
+  for the same image and one MAY shadow the other. Images the mirror itself
+  originates, which are referenced by its own name, belong to its own Group.
+
+Because the registry name is part of the reference, the same `imageid` under two
+`containerregistryid` values denotes two unrelated repositories and MUST NOT be
+conflated.
+
+Access control is a property of the registry deployment rather than of the
+identifier. A server MAY omit Groups or entries the caller is not entitled to
+see; a caller MUST NOT infer from an absence that the registry or repository
+does not exist. The `sourceurl` meta attribute on a Resource records the base
+URL that image was fetched from, which for a mirrored image is the mirror rather
+than the named registry; where it is present it MUST be consistent with the
+service that actually served the content.
 
 ### 4.2. Resource Identity
 
@@ -317,9 +375,21 @@ An implementation MUST derive the `imageid` as follows:
   an `imageid` beginning with `xh~` in any other circumstance.
 
 The `imageid` is an identifier, not an encoding, and consumers MUST NOT attempt
-to recover the repository name from it. The namespace and repository components
-MUST be preserved in the `namespace` and `repository` meta attributes, and
-consumers addressing the registry itself MUST read those attributes.
+to recover the repository name from it.
+
+An implementation MUST set the xRegistry Core `name` attribute to the complete
+OCI repository name, verbatim and unaltered, including its `/` separators — for
+example `library/nginx`. `name` is the authoritative statement of what the image
+is called in the registry; the `imageid` is only an addressing key derived from
+it. A consumer that needs the repository name, whether to construct a pull
+reference, to call the OCI Distribution API, or to display the image, MUST read
+`name` and MUST NOT reconstruct it from the `imageid`. This holds even when the
+`imageid` appears reversible, because the `xh~` form is not, and a consumer
+cannot in general tell from the `imageid` alone which form was used.
+
+The namespace and repository components MUST additionally be preserved
+separately in the `namespace` and `repository` meta attributes, which partition
+the same value for consumers that address the two components independently.
 
 ### 4.3. Version Identity
 
@@ -376,10 +446,16 @@ xRegistry pagination specification and is independent of the OCI paging above.
 
 The Group (`<GROUP>`) name is `containerregistry` (singular); the plural, used
 as the collection name, is `containerregistries`. A `containerregistry`
-represents one OCI registry provider.
+represents one OCI registry as it is named in an image reference, which is part
+of the identity of the images it holds. See
+[Section 4.1](#41-group-identity) for how the identifier is formed.
 
-This extension defines no Group-level extension attributes beyond those
-inherited from [xRegistry Core][xRegistry Core].
+This extension defines the following Group-level extension attributes, in
+addition to those inherited from [xRegistry Core][xRegistry Core]:
+
+| xRegistry attribute | Type | Description |
+|---|---|---|
+| `sourceurl` | `url` | Base URL of the Distribution API these images were projected from, for example `https://registry-1.docker.io/v2/`. Provenance only. |
 
 ## 6. Resource: `image`
 
@@ -393,7 +469,8 @@ collection name, is `images`.
 | `urls` | `object` | Related URLs: `pull`, `manifest`, `config`. |
 
 `name` and `description` are xRegistry Core attributes; this extension does not
-redefine them.
+redefine them, but it does constrain the value of `name`, which MUST carry the
+complete OCI repository name — see [4.2](#42-resource-identity).
 
 The registry endpoint, namespace and repository name are properties of the
 image as a whole and do not vary between tags, so they are `metaattributes`
@@ -626,11 +703,11 @@ describe the image as a whole and do not vary between tags:
 
 | Meta attribute | Type | Description |
 |---|---|---|
-| `registry` | `string` | Base URL of the registry hosting the image. |
+| `sourceurl` | `url` | Base URL of the OCI Distribution API this image was actually fetched from. Provenance only. |
 | `namespace` | `string` | The namespace or organization component of the repository name. |
 | `repository` | `string` | The repository component of the repository name. |
 | `pulled` | `uinteger` | Number of times the image has been pulled, across all tags. Registry-proprietary and OPTIONAL. |
-| `starred` | `uinteger` | Number of stars or favourites. Registry-proprietary and OPTIONAL. |
+| `starred` | `uinteger` | Number of stars or favorites. Registry-proprietary and OPTIONAL. |
 | `deprecated_message` | `string` | Free-text deprecation notice, when the registry publishes one. Registry-proprietary and OPTIONAL. |
 
 `pulled`, `starred` and `deprecated_message` are registry-proprietary: none of

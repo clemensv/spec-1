@@ -1,4 +1,11 @@
 # Maven Repository Mapping - Version 1.0-rc1
+<!-- words: activebydefault artifactid boms classpath dependencymanagement -->
+<!-- words: developerconnection gav homepage issuemanagement javanamespace -->
+<!-- words: javanamespaceid javanamespaces javanamespacescount -->
+<!-- words: javanamespacesurl jdk junit metaattribute namespace namespaces -->
+<!-- words: openpgp packageid packagescount packagesurl pgp poms -->
+<!-- words: relativepath scm sonatype sourceurl spdx systempath timestamped -->
+<!-- words: versionranges xh -->
 
 ## Abstract
 
@@ -424,7 +431,7 @@ verified Maven `groupId` — that is, one publishing organization.
 
 | xRegistry attribute | Type | Description |
 |---|---|---|
-| `group_id` | `string` | REQUIRED. The `groupId` this namespace represents. Its value is identical to the `javanamespaceid` and is repeated as an attribute so that clients that hold a Group document need not consult the path. |
+| `group_id` | `string` | REQUIRED. The `groupId` this namespace represents. Its value is normally identical to the `javanamespaceid` and is repeated as an attribute so that clients that hold a Group document need not consult the path. The two differ when the `javanamespaceid` has been hashed to resolve a case-insensitive collision, in which case this attribute is the only place the verbatim `groupId` appears. |
 | `sourceurl` | `url` | OPTIONAL. Base URL of the repository from which the namespace was projected, e.g. `https://repo.maven.apache.org/maven2`. This records provenance only; the same `groupId` denotes the same publisher whichever mirror serves it. |
 
 ## 6. Resource: `package`
@@ -441,7 +448,8 @@ Resource attribute at all — it is the enclosing Group.
 
 | xRegistry attribute | Type | POM element | Description |
 |---|---|---|---|
-| `artifact_id` | `string` | `project/artifactId` | The Maven artifact identifier. |
+| `group_id` | `string` | `project/groupId` | REQUIRED. The Maven `groupId`, verbatim. Normally identical to the `javanamespaceid`, but not when that identifier has been hashed to resolve a case-insensitive collision, so a consumer addressing Maven Central MUST read this attribute rather than the enclosing Group identifier. |
+| `artifact_id` | `string` | `project/artifactId` | REQUIRED. The Maven artifact identifier, verbatim. Authoritative; the `packageid` MAY be a hash where two `artifactId`s collide case-insensitively. |
 
 The following are Version attributes, because they vary per release:
 

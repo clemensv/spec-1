@@ -1,4 +1,14 @@
 # NuGet Package Registry Mapping - Version 1.0-rc1
+<!-- words: advisoryurl alternatepackage criticalbugs cvss dependencygroups -->
+<!-- words: dotnetregistries dotnetregistriescount dotnetregistriesurl -->
+<!-- words: dotnetregistry dotnetregistryid dotnettool homepage iconurl -->
+<!-- words: licenseexpression licenseurl lowercased minclientversion -->
+<!-- words: newtonsoft nuget nupkg nuspec oid packagecontent packageid -->
+<!-- words: packagescount packagesurl packagetypes projecturl pypi readme -->
+<!-- words: readmeurl repositorysignatures requirelicenseacceptance -->
+<!-- words: sourceurl spdx -->
+<!-- words: targetframework tfm tfms tolowerinvariant totaldownloads -->
+<!-- words: unlisting -->
 
 ## Abstract
 
@@ -17,10 +27,12 @@ of the xRegistry document format and API [specification][xRegistry Core].
 - [3. Registry Model](#3-registry-model)
 - [4. Identity Mapping](#4-identity-mapping)
   - [4.1. Group Identity](#41-group-identity)
+    - [4.1.1. Projection Identity Rules](#411-projection-identity-rules)
   - [4.2. Resource Identity](#42-resource-identity)
   - [4.3. Version Identity](#43-version-identity)
   - [4.4. Timestamps](#44-timestamps)
 - [5. Group: `dotnetregistry`](#5-group-dotnetregistry)
+  - [5.1. Repository Signatures](#51-repository-signatures)
 - [6. Resource: `package`](#6-resource-package)
   - [6.1. Attribute Mapping](#61-attribute-mapping)
   - [6.2. Package-Level Attributes](#62-package-level-attributes)
@@ -111,7 +123,7 @@ to this form:
   "dotnetregistriesurl": "<URL>",
   "dotnetregistriescount": <UINTEGER>,
   "dotnetregistries": {
-    "<KEY>": {                                  # dotnetregistryid, nuget.org
+    "<KEY>": {                                  # dotnetregistryid, nuget
       "dotnetregistryid": "<STRING>",           # xRegistry core attributes
       "self": "<URL>",
       "shortself": "<URL>", ?
@@ -123,6 +135,19 @@ to this form:
       "labels": { "<STRING>": "<STRING>" * }, ?
       "createdat": "<TIMESTAMP>",
       "modifiedat": "<TIMESTAMP>",
+
+      "sourceurl": "<URL>", ?                  # V3 service index of this feed
+      "all_repository_signed": <BOOLEAN>, ?
+      "repository_signing_certificates": [
+        {
+          "subject": "<STRING>",
+          "issuer": "<STRING>",
+          "fingerprint_sha256": "<STRING>",
+          "not_before": "<TIMESTAMP>",
+          "not_after": "<TIMESTAMP>",
+          "content_url": "<URL>"
+        } *
+      ], ?
 
       "packagesurl": "<URL>",
       "packagescount": <UINTEGER>,
@@ -220,8 +245,44 @@ to this form:
 
 ### 4.1. Group Identity
 
-The `dotnetregistryid` MUST identify the NuGet source that serves the packages,
-for example `nuget.org`.
+A Group is one **projection** of an ecosystem's package metadata into
+xRegistry. The `dotnetregistryid` names that projection. For packages projected
+from the NuGet V3 metadata model the `dotnetregistryid` MUST be `nuget`.
+
+The identifier is deliberately not a feed, a host or an account. A registry that
+serves NuGet packages from the public service, from a mirror, from an internal
+proxy or from a private feed uses the same `nuget` Group, so that
+`/dotnetregistries/nuget/packages/<packageid>` denotes the same package wherever
+it is served.
+
+See [Section 4.1.1](#411-projection-identity-rules) for the rules that govern
+this identifier.
+
+#### 4.1.1. Projection Identity Rules
+
+- The identifier MUST be stable across every deployment that serves the same
+  projection, and MUST NOT vary by serving host, tenancy or access level. An
+  implementation MUST NOT derive it from a DNS name, a URL authority or an
+  account name. This is what allows one registry to shadow another: a package
+  served from an air-gapped mirror MUST present the same path as the same
+  package served from the public service.
+- Where NuGet introduces a metadata model that cannot be projected into the
+  attributes defined in this specification without loss or contradiction, that
+  model MUST be given a new Group identifier, for example `nuget-v4`. Both
+  Groups MAY then coexist in one registry, and a client selects the model it
+  understands instead of being handed attributes whose meaning has silently
+  changed.
+- Where two parties project this ecosystem under incompatible interpretations,
+  each MUST use a distinct Group identifier. A Group therefore identifies the
+  ecosystem together with the reading of it that produced the entries, and two
+  entries in the same Group are directly comparable.
+
+Access control is a property of the registry deployment rather than of the
+identifier. A registry that exposes only a private feed's packages still exposes
+them under `nuget`, and MAY omit entries the caller is not entitled to see; a
+caller MUST NOT infer from an entry's absence that it does not exist upstream.
+Where entries drawn from different feeds are served together, the `sourceurl`
+attribute records which service each Group's entries were projected from.
 
 ### 4.2. Resource Identity
 
@@ -284,10 +345,65 @@ listing state through `listed`. See
 
 The Group (`<GROUP>`) name is `dotnetregistry` (singular); the plural, used as
 the collection name, is `dotnetregistries`. A `dotnetregistry` represents one
-NuGet package source.
+projection of the NuGet metadata model into xRegistry. Its identifier names that
+projection rather than the service that serves it. See
+[Section 4.1](#41-group-identity) for how the identifier is formed.
 
-This extension defines no Group-level extension attributes beyond those
-inherited from [xRegistry Core][xRegistry Core].
+This extension defines the following Group-level extension attributes, in
+addition to those inherited from [xRegistry Core][xRegistry Core]:
+
+| xRegistry attribute | Type | Description |
+|---|---|---|
+| `sourceurl` | `url` | Base URL of the feed these packages were projected from, for example `https://api.nuget.org/v3/index.json`. Provenance only. |
+| `all_repository_signed` | `boolean` | Whether every package the feed serves carries a repository signature. |
+| `repository_signing_certificates` | `array` of `object` | The certificates the feed uses to repository-sign packages, see [5.1](#51-repository-signatures). |
+
+### 5.1. Repository Signatures
+
+NuGet distinguishes two signatures on a `.nupkg`. An *author* signature is
+applied by the publisher before upload. A *repository* signature is applied by
+the feed. The two answer different questions: the author signature attests who
+built the package, the repository signature attests which feed accepted and
+served it.
+
+Only the repository signature is described by the V3 protocol, through the
+[`RepositorySignatures`][RepositorySignatures] resource of the service index.
+That resource is a property of the feed, not of any package, which is why it is
+projected onto the Group and not onto a Resource or Version. Each entry has the
+following shape:
+
+```yaml
+{
+  "subject": "STRING",                 # subject distinguished name
+  "issuer": "STRING",                  # issuer distinguished name
+  "fingerprint_sha256": "STRING",      # lowercase hex SHA-256
+  "not_before": "TIMESTAMP",
+  "not_after": "TIMESTAMP",
+  "content_url": "URL"                 # DER-encoded public certificate
+}
+```
+
+The upstream `fingerprints` object is keyed by hash algorithm OID, and
+`2.16.840.1.101.3.4.2.1` — SHA-256 — is the only key the protocol requires. An
+attribute name MUST match `[a-z0-9_]`, so the OID cannot be carried as a key
+here; the value is projected as `fingerprint_sha256` instead. An implementation
+that encounters a further OID MUST NOT discard the SHA-256 value in favour of
+it.
+
+Certificates are appended to the upstream list as older ones expire, so the
+array MAY contain entries whose validity period has passed; those remain
+meaningful because packages signed under them are still served. Removal of a
+certificate upstream invalidates the signatures made with it, so an
+implementation MUST NOT retain an entry the feed has stopped advertising.
+
+This specification defines **no** author signing certificate attribute. The V3
+protocol exposes no author signature metadata at all: it is carried inside the
+`.nupkg` and is verified by the client against the artifact. An implementation
+MUST NOT synthesize an author certificate subject by opening the artifact and
+reading its signature, because the resulting value would assert a verification
+the registry never performed and a consumer could not distinguish it from one
+the feed had vouched for. A consumer that requires author identity MUST fetch
+`package_content` and verify the signature itself.
 
 ## 6. Resource: `package`
 
@@ -553,3 +669,4 @@ MAY omit any attribute for which the upstream source supplies no value.
 [nuget.org]: https://www.nuget.org/
 [version ranges]: https://learn.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges
 [semver]: https://semver.org/
+[RepositorySignatures]: https://learn.microsoft.com/en-us/nuget/api/repository-signatures-resource

@@ -1,4 +1,11 @@
 # Composer / Packagist Registry Mapping - Version 1.0-rc1
+<!-- words: autoload classmap composerregistries composerregistriescount -->
+<!-- words: composerregistriesurl composerregistry composerregistryid -->
+<!-- words: currentversion executables favers getcomposer gpl homepage irc -->
+<!-- words: laravel licenseref namespace packageid packagepath -->
+<!-- words: packagescount packagesurl packagist patreon php prebuilt psr -->
+<!-- words: readme rss shasum sourcereference spdx symfony tidelift -->
+<!-- words: untruncated vcs versionnormalized wiki xh -->
 
 ## Abstract
 
@@ -503,12 +510,12 @@ the package as a whole:
 | xRegistry attribute | Type | Description |
 |---|---|---|
 | `downloads` | `object` | Download statistics: `total`, `monthly`, `daily`, each `uinteger`. |
-| `favers` | `uinteger` | Number of users who have favourited the package. |
+| `favers` | `uinteger` | Number of users who have marked the package as a favorite. |
 | `currentversion` | `string` | The raw Composer version selected for display on the Resource. |
 | `readme` | `string` | The rendered package README as published by Packagist. |
 | `default-branch` | `string` | The VCS branch Packagist treats as the package default, e.g. `main`. |
 
-Download counts and favourite counts are cardinalities and can never be
+Download counts and favorite counts are cardinalities and can never be
 negative, so they are typed `uinteger` rather than `integer`.
 
 `readme` and `default-branch` are Resource-level rather than Version-level:

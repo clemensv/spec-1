@@ -5,6 +5,12 @@
       "description": "A group representing a Python package registry provider (e.g., pypi.org). Contains all available Python package registries.",
       "plural": "pythonregistries",
       "singular": "pythonregistry",
+      "attributes": {
+        "sourceurl": {
+          "type": "url",
+          "description": "Base URL of the Python package index from which these projects were projected, e.g. 'https://pypi.org/simple/'. This records provenance only; a project name denotes the same project whichever index serves it."
+        }
+      },
       "resources": {
         "packages": {
           "description": "A resource representing a Python package in the registry, including its metadata and available versions.",
@@ -12,6 +18,16 @@
           "singular": "package",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The project name exactly as published, in the non-normalized form declared by the distribution's 'Name' metadata field. This is the authoritative name of the project; the packageid is normally the normalized form and MUST NOT be substituted for this value."
+            },
+            "version": {
+              "type": "string",
+              "required": true,
+              "description": "The PEP 440 version string exactly as published, including any local version segment introduced by '+'. This is the authoritative version; the versionid is a transliteration of it and MUST NOT be reversed."
+            },
             "summary": {
               "type": "string",
               "description": "A short summary or tagline describing the package."
@@ -169,6 +185,10 @@
                   "core_metadata": {
                     "type": "any",
                     "description": "Projects the 'core-metadata' key served by the PyPI JSON API for this file, declaring PEP 658/714 availability of the distribution's metadata as a separate fetch: either the boolean true or a map of hash name to hash value. Allows a client to obtain the metadata without downloading the artifact."
+                  },
+                  "provenance": {
+                    "type": "url",
+                    "description": "Projects the 'provenance' key served by the JSON Simple API (api-version 1.3 or later) for this file: the URL of the PEP 740 provenance object holding the digital attestations published with the artifact. Absent when the index served no value or served null, which means the file has no attestations. The provenance object itself is deliberately not embedded."
                   },
                   "digests": {
                     "type": "object",

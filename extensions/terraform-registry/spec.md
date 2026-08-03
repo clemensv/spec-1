@@ -1,4 +1,10 @@
 # Terraform Registry Mapping - Version 1.0-rc1
+<!-- words: azurerm gpg hashicorp hostname installable linux moduleid -->
+<!-- words: modulescount modulesurl namespace namespaces plugin providerid -->
+<!-- words: providerscount providersurl readme shasum shasums sourceurl -->
+<!-- words: terraform terraformregistries terraformregistriescount -->
+<!-- words: terraformregistriesurl terraformregistry terraformregistryid -->
+<!-- words: unlisting vpc xh -->
 
 ## Abstract
 
@@ -149,7 +155,7 @@ this form:
 
       # Group extension attributes
       "namespace": "<STRING>",                  # e.g. hashicorp
-      "registryhost": "<STRING>",               # e.g. registry.terraform.io
+      "sourceurl": "<URL>",                     # e.g. https://registry.terraform.io
       "providers_v1": "<STRING>", ?             # providers.v1 discovery value
       "modules_v1": "<STRING>", ?               # modules.v1 discovery value
 
@@ -177,7 +183,7 @@ this form:
           "namespace": "<STRING>", ?
           "type": "<STRING>", ?                 # e.g. aws
           "source": "<STRING>", ?               # canonical namespace/type
-          "registryhost": "<STRING>", ?
+          "sourceurl": "<URL>", ?
           "published_at": "<TIMESTAMP>", ?      # public-registry extension
           "protocols": [ "<STRING>" * ], ?      # release-level, e.g. 5.0
 
@@ -255,7 +261,7 @@ this form:
           "provider": "<STRING>", ?             # identity, not a dependency
           "source_address": "<STRING>", ?       # namespace/name/provider
           "source": "<URI>", ?                  # repository URL, upstream field
-          "registryhost": "<STRING>", ?
+          "sourceurl": "<URL>", ?
           "download_url": "<URI>", ?            # from X-Terraform-Get
           "published_at": "<TIMESTAMP>", ?
           "providers": [ "<STRING>" * ], ?      # sibling provider systems
@@ -342,6 +348,11 @@ The `providerid` MUST be the provider type — the component after the namespace
 The canonical address MUST be preserved in the `source` attribute, and the
 components in `namespace` and `type`.
 
+An implementation MUST additionally set the xRegistry Core `name` attribute to
+the provider type, verbatim. `name` is the authoritative statement of what the
+provider is called; the `providerid` is only an addressing key derived from it.
+A consumer addressing the Terraform Registry MUST read `name`.
+
 ### 4.3. Module Resource Identity
 
 A module's native address has three components, one more than the two-level
@@ -378,6 +389,10 @@ construction. The canonical address MUST be preserved in `source_address`, and
 its components in `namespace`, `name` and `provider`; consumers addressing the
 Terraform Registry itself MUST read `source_address`.
 
+`name` carries the module name component verbatim and is REQUIRED. Where the
+`moduleid` has been hashed it is the only place the module name appears, so an
+implementation MUST populate it whichever form the `moduleid` takes.
+
 `source` is *not* the canonical address. It carries the module's repository URL
 exactly as the upstream `source` field returns it, for example
 `https://github.com/hashicorp/terraform-aws-consul`. Consumers MUST NOT treat
@@ -397,9 +412,15 @@ used, because `%` is itself not a valid Entity ID character.
 alphanumerics, `.`, `-` and `+`, so the substitution is collision-free.
 
 The `versionid` is an identifier, not an encoding, and consumers MUST NOT
-attempt to recover the upstream version from it. The Version's `name` attribute
-MUST carry the released version string exactly, and consumers addressing the
-Terraform Registry MUST read `name`.
+attempt to recover the upstream version from it. The `version` attribute MUST
+carry the released version string exactly, and consumers addressing the
+Terraform Registry MUST read `version`.
+
+The upstream version string is carried in `version` rather than in `name`
+because xRegistry Core defines a single `name` per entity, and this extension
+already binds `name` to the provider or module name component
+([Section 4.2](#42-provider-resource-identity) and
+[Section 4.3](#43-module-resource-identity)). A Version cannot name both.
 
 Provider and module versions are immutable once published. Versions MUST be
 ordered by strict SemVer precedence; build metadata is a deterministic
@@ -416,12 +437,12 @@ advance it.
 
 The Group identity carries only the namespace, not the registry host. A
 deployment conforming to this specification therefore serves exactly one
-registry host, recorded in the `registryhost` attribute on the Group and on
-every Resource.
+registry host, whose base URL is recorded in the `sourceurl` attribute on the
+Group and on every Resource.
 
 A deployment that aggregates several hosts MUST disambiguate Group identity —
 for example by using collision-free `host~namespace` identifiers — while
-continuing to populate `registryhost` and `namespace`. It MUST NOT silently
+continuing to populate `sourceurl` and `namespace`. It MUST NOT silently
 merge equally-named namespaces originating from different hosts, since they are
 unrelated publishers.
 
@@ -434,7 +455,7 @@ represents one namespace on one registry host.
 | Group attribute | Type | Description |
 |---|---|---|
 | `namespace` | `string` | The canonical Terraform namespace; equal to the `terraformregistryid`. |
-| `registryhost` | `string` | The upstream Terraform registry host, e.g. `registry.terraform.io`. |
+| `sourceurl` | `url` | Base URL of the upstream Terraform registry, e.g. `https://registry.terraform.io`. Provenance only. |
 | `providers_v1` | `string` | The `providers.v1` service discovery value published by the host. |
 | `modules_v1` | `string` | The `modules.v1` service discovery value published by the host. |
 
@@ -453,11 +474,11 @@ document) at which those protocols are served:
 }
 ```
 
-`registryhost` therefore names the host, and `providers_v1` and `modules_v1`
+`sourceurl` therefore locates the host, and `providers_v1` and `modules_v1`
 record what that host advertised. An implementation SHOULD populate them with
 the discovery values verbatim, without resolving them, so that a consumer can
-reconstruct the upstream endpoints. An implementation MUST NOT synthesize a
-value the host did not advertise.
+reconstruct the upstream endpoints by resolving them against `sourceurl`. An
+implementation MUST NOT synthesize a value the host did not advertise.
 
 ### 5.2. Independence of the Two Collections
 
@@ -485,11 +506,13 @@ the collection name, is `providers`.
 
 | xRegistry attribute | Type | Description |
 |---|---|---|
+| `name` | `string` | REQUIRED. The provider type, verbatim. Authoritative; the `providerid` is only an addressing key derived from it. |
+| `version` | `string` | REQUIRED. The released version string exactly as published, including any build metadata. Authoritative; the `versionid` is a transliteration of it. |
 | `namespace` | `string` | The namespace owning the provider. |
 | `type` | `string` | The provider type identifier, e.g. `aws`. |
 | `source` | `string` | The canonical `namespace/type` source address. |
 | `description` | `string` | Human-readable description of the provider. |
-| `registryhost` | `string` | The upstream registry host. |
+| `sourceurl` | `url` | Base URL of the upstream registry. Provenance only. |
 | `published_at` | `timestamp` | Publication time of the release. OPTIONAL public-registry extension; the provider registry protocol does not return it. |
 | `protocols` | `array` of `string` | Plugin protocol versions declared for the release, e.g. `["5.0"]`. |
 
@@ -619,12 +642,14 @@ collection name, is `modules`.
 
 | xRegistry attribute | Type | Description |
 |---|---|---|
+| `name` | `string` | REQUIRED. The module name component, verbatim. Authoritative, and the only place the name appears when the `moduleid` has been hashed. |
+| `version` | `string` | REQUIRED. The released version string exactly as published, including any build metadata. Authoritative; the `versionid` is a transliteration of it. |
 | `id` | `string` | The upstream module identifier, of the form `namespace/name/system/version`. |
 | `namespace` | `string` | The namespace owning the module. |
 | `provider` | `string` | The provider system the module targets, e.g. `aws`. |
 | `source_address` | `string` | The canonical `namespace/name/provider` source address, as written in a Terraform `module` block. |
 | `source` | `uri` | The module's **repository URL**, returned verbatim in the upstream `source` field, e.g. `https://github.com/hashicorp/terraform-aws-consul`. |
-| `registryhost` | `string` | The upstream registry host. |
+| `sourceurl` | `url` | Base URL of the upstream registry. Provenance only. |
 | `download_url` | `uri` | The module package source address from the `X-Terraform-Get` response header; see [Section 7.2](#72-retrieving-the-module-package). |
 | `published_at` | `timestamp` | RFC 3339 timestamp at which the Version was published. |
 | `providers` | `array` of `string` | The provider systems for which a module of this name exists in this namespace. |

@@ -4,6 +4,49 @@
       "plural": "dotnetregistries",
       "singular": "dotnetregistry",
       "description": "Groups of .NET package registries",
+      "attributes": {
+        "sourceurl": {
+          "type": "url",
+          "description": "Base URL of the NuGet feed from which these packages were projected, e.g. 'https://api.nuget.org/v3/index.json'. This records provenance only; a package ID denotes the same package whichever feed serves it."
+        },
+        "all_repository_signed": {
+          "type": "boolean",
+          "description": "Projects 'allRepositorySigned' from the feed's RepositorySignatures resource: whether every package the feed serves carries a repository signature produced by one of the certificates in repository_signing_certificates."
+        },
+        "repository_signing_certificates": {
+          "type": "array",
+          "item": {
+            "type": "object",
+            "attributes": {
+              "subject": {
+                "type": "string",
+                "description": "The subject distinguished name of the repository signing certificate."
+              },
+              "issuer": {
+                "type": "string",
+                "description": "The distinguished name of the certificate's issuer."
+              },
+              "fingerprint_sha256": {
+                "type": "string",
+                "description": "The lowercase hex-encoded SHA-256 fingerprint of the certificate, projected from the '2.16.840.1.101.3.4.2.1' key of the upstream 'fingerprints' object."
+              },
+              "not_before": {
+                "type": "timestamp",
+                "description": "Start of the certificate's validity period."
+              },
+              "not_after": {
+                "type": "timestamp",
+                "description": "End of the certificate's validity period."
+              },
+              "content_url": {
+                "type": "url",
+                "description": "Absolute URL of the DER-encoded public certificate."
+              }
+            }
+          },
+          "description": "The certificates the feed uses to repository-sign packages, projected from 'signingCertificates' of the RepositorySignatures resource. These describe the feed, not any individual package."
+        }
+      },
       "resources": {
         "packages": {
           "singular": "package",
@@ -11,6 +54,11 @@
           "description": "NuGet packages",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The NuGet package ID in the casing published by the owner. This is the authoritative name of the package; the packageid is the lowercased form used for addressing and loses the owner's casing, so it MUST NOT be substituted for this value."
+            },
             "version": {
               "type": "string",
               "description": "The verbatim upstream version string of the package, exactly as published. Consumers addressing nuget.org MUST read this attribute rather than reconstructing a version from the versionid."

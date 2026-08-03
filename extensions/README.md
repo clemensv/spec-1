@@ -1,4 +1,11 @@
 # xRegistry Ecosystem Extensions
+<!-- words: artifactid composerregistries containerregistries -->
+<!-- words: dartregistries dotnet dotnetregistries ghcr goregistries -->
+<!-- words: huggingface huggingfaceregistries javanamespaces mcp -->
+<!-- words: mcpproviders namespace namespaces nodejs nodescopes nuget -->
+<!-- words: packagist php pypi pythonregistries rubygems rubyregistries -->
+<!-- words: rustregistries sourceurl terraform terraformregistries -->
+<!-- words: versionnormalized xh -->
 
 This directory contains specifications that express the metadata of existing
 package, artifact and service registries in terms of
@@ -64,6 +71,23 @@ therefore preserves the exact upstream identifier verbatim in `name` (or in a
 named ecosystem attribute such as `version`), and requires consumers addressing
 the origin registry to read that attribute rather than decode an identifier.
 
+Two corollaries follow, and both are binding on every extension in this
+directory:
+
+- **The authoritative name is REQUIRED, not optional.** Core leaves `name`
+  OPTIONAL, but an identifier that cannot be reversed is useless without it, so
+  each extension redeclares its authoritative name attribute as `required`.
+  Without that, a projection could omit the only verbatim copy of the upstream
+  name and still be valid. Where Core `name` is already bound to an upstream
+  *display* name — Maven's `project/name`, which is prose such as "Apache
+  Commons Lang" and not the `artifactId` — the ecosystem attributes carrying
+  identity (`group_id`, `artifact_id`) are the ones marked required instead.
+- **`name` names the Resource, never the Version string.** Core defines a single
+  `name` per entity, so an extension cannot bind `name` to the Resource's
+  package name and to the version string on the Version; one silently overwrites
+  the other. The verbatim upstream version therefore always lives in a named
+  attribute — `version`, `num` or `versionnormalized` — and never in `name`.
+
 An identifier must only be **deterministic, stable and collision-free**. Freed
 from reversibility, the extensions derive identifiers in this order of
 preference:
@@ -80,6 +104,67 @@ Separately, identifiers containing `/` — npm scopes, Go module paths, Composer
 vendor/package, OCI repository names, Hugging Face `owner/name` — are handled
 wherever possible by promoting the leading component to the Group, so that the
 `/` becomes the Group/Resource boundary and needs no encoding at all.
+
+**The Group as the projection boundary.** Where an ecosystem has no namespace
+component to promote, the Group instead denotes the **projection**: one reading
+of an upstream ecosystem's metadata model into the attributes these
+specifications define. This covers the five ecosystems whose package names are
+flat, and their Group identifiers are the fixed tokens `nuget`, `pypi`,
+`rubygems`, `crates-io` and `pub`.
+
+The identifier is deliberately not a host, a feed or an account. A flat
+ecosystem's package name is global — a NuGet package ID or a PyPI project name
+denotes the same artifact whoever serves it — so binding the serving authority
+into the path would make the same artifact unreachable under the same URI when
+it is served from a mirror, an internal proxy or a private network. Keeping the
+Group constant is what allows one registry to shadow another, as described in
+[Section 8.3 of the core primer](../core/primer.md).
+
+Holding a constant there is not wasted, because it gives the ecosystem somewhere
+to put disagreement and change:
+
+- **Breaking upstream change.** When an upstream registry adopts a metadata
+  model that cannot be projected into the existing attributes without loss or
+  contradiction, the new model takes a new Group identifier — `nuget-v4`,
+  `pypi-v2` — and the two coexist in one registry. A client selects the model it
+  understands instead of being handed attributes whose meaning changed
+  underneath it.
+- **Conflicting definitions.** Where two parties project the same ecosystem
+  under incompatible interpretations, each takes its own Group identifier. A
+  Group therefore identifies an ecosystem together with the reading of it that
+  produced the entries, and any two entries within one Group are directly
+  comparable.
+
+Access control is a property of the registry deployment rather than of the
+identifier. A registry serving only a private feed still serves it under the
+same Group, and may omit entries the caller is not entitled to see; absence is
+not evidence that an artifact does not exist upstream.
+
+OCI container registries are the exception, and deliberately so. An OCI
+repository name is not global: `library/nginx` means nothing without a registry,
+and the registry name is written into every fully qualified reference. There the
+registry name is part of the artifact's own identity rather than an address, so
+`containerregistries` keeps host-shaped identifiers — `docker.io`, `ghcr.io` —
+and a pull-through cache files images under the registry the reference names
+rather than under its own.
+
+Each of these Groups carries an OPTIONAL `sourceurl` attribute holding the base
+URL the artifacts were projected from, matching the attribute of the same name
+already used by the npm and Maven Groups. It records provenance and never
+identity, which is also why it can differ between two registries serving the
+same entries.
+
+`sourceurl` is the single name for that idea across every extension here, and it
+is always typed `url`. Where an ecosystem needs per-entry provenance because a
+Group may be assembled from more than one upstream, the same name is reused at
+the Resource level rather than a second name being coined: `containerregistries`
+carries `sourceurl` on an image to record the mirror that actually served it,
+and `terraformregistries` carries it on a module and on a provider.
+
+The remaining Groups are namespaces, even where the name suggests otherwise:
+`goregistries` holds the leading component of a module path,
+`huggingfaceregistries` a Hub owner, `composerregistries` a Composer vendor, and
+`mcpproviders` the reverse-DNS namespace of a server name.
 
 **Version ordering.** `versionmode` is chosen per ecosystem according to what
 the upstream registry actually guarantees: `semver` where SemVer is mandated,

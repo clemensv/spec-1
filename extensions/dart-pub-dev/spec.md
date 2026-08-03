@@ -1,4 +1,9 @@
 # pub.dev Package Registry Mapping - Version 1.0-rc1
+<!-- words: advisoriesupdated dartregistries dartregistriescount -->
+<!-- words: dartregistriesurl dartregistry dartregistryid executables -->
+<!-- words: grantedpoints gz homepage isdiscontinued likecount lowercased -->
+<!-- words: maxpoints packageid packagescount packagesurl pubspec sdk sdks -->
+<!-- words: sourceurl spdx toolchain toolchains uploader -->
 
 ## Abstract
 
@@ -18,6 +23,7 @@ format and API [specification][xRegistry Core].
 - [3. Registry Model](#3-registry-model)
 - [4. Identity Mapping](#4-identity-mapping)
   - [4.1. Group Identity](#41-group-identity)
+    - [4.1.1. Projection Identity Rules](#411-projection-identity-rules)
   - [4.2. Resource Identity](#42-resource-identity)
   - [4.3. Version Identity](#43-version-identity)
   - [4.4. Timestamps](#44-timestamps)
@@ -128,7 +134,7 @@ to this form:
   "dartregistriesurl": "<URL>",
   "dartregistriescount": <UINTEGER>,
   "dartregistries": {
-    "<KEY>": {                                  # dartregistryid, e.g. pub.dev
+    "<KEY>": {                                  # dartregistryid, e.g. pub
       "dartregistryid": "<STRING>",             # xRegistry core attributes
       "self": "<URL>",
       "shortself": "<URL>", ?
@@ -140,6 +146,8 @@ to this form:
       "labels": { "<STRING>": "<STRING>" * }, ?
       "createdat": "<TIMESTAMP>",
       "modifiedat": "<TIMESTAMP>",
+
+      "sourceurl": "<URL>", ?                  # base URL of this pub server
 
       "packagesurl": "<URL>",
       "packagescount": <UINTEGER>,
@@ -238,8 +246,45 @@ to this form:
 
 ### 4.1. Group Identity
 
-The `dartregistryid` MUST identify the pub registry provider, for example
-`pub.dev`.
+A Group is one **projection** of an ecosystem's package metadata into
+xRegistry. The `dartregistryid` names that projection. For packages projected
+from the pub metadata model the `dartregistryid` MUST be `pub`.
+
+The identifier is deliberately not a server, a host or an account. A registry
+that serves Dart packages from the public server, from a mirror, from an
+internal proxy or from a private hosted server uses the same `pub` Group, so
+that `/dartregistries/pub/packages/<packageid>` denotes the same package
+wherever it is served.
+
+See [Section 4.1.1](#411-projection-identity-rules) for the rules that govern
+this identifier.
+
+#### 4.1.1. Projection Identity Rules
+
+- The identifier MUST be stable across every deployment that serves the same
+  projection, and MUST NOT vary by serving host, tenancy or access level. An
+  implementation MUST NOT derive it from a DNS name, a URL authority or an
+  account name. This is what allows one registry to shadow another: a package
+  served from an air-gapped mirror MUST present the same path as the same
+  package served from the public server.
+- Where pub introduces a metadata model that cannot be projected into the
+  attributes defined in this specification without loss or contradiction, that
+  model MUST be given a new Group identifier, for example `pub-v2`. Both Groups
+  MAY then coexist in one registry, and a client selects the model it
+  understands instead of being handed attributes whose meaning has silently
+  changed.
+- Where two parties project this ecosystem under incompatible interpretations,
+  each MUST use a distinct Group identifier. A Group therefore identifies the
+  ecosystem together with the reading of it that produced the entries, and two
+  entries in the same Group are directly comparable.
+
+Access control is a property of the registry deployment rather than of the
+identifier. A registry that exposes only a private server's packages still
+exposes them under `pub`, and MAY omit entries the caller is not entitled to
+see; a caller MUST NOT infer from an entry's absence that it does not exist
+upstream. Where entries drawn from different servers are served together, the
+`sourceurl` attribute records which service each Group's entries were projected
+from.
 
 ### 4.2. Resource Identity
 
@@ -290,11 +335,17 @@ restating that observation time in it.
 ## 5. Group: `dartregistry`
 
 The Group (`<GROUP>`) name is `dartregistry` (singular); the plural, used as the
-collection name, is `dartregistries`. A `dartregistry` represents one Dart and
-Flutter package registry provider.
+collection name, is `dartregistries`. A `dartregistry` represents one
+projection of the pub metadata model into xRegistry. Its identifier names that
+projection rather than the service that serves it. See
+[Section 4.1](#41-group-identity) for how the identifier is formed.
 
-This extension defines no Group-level extension attributes beyond those
-inherited from [xRegistry Core][xRegistry Core].
+This extension defines the following Group-level extension attributes, in
+addition to those inherited from [xRegistry Core][xRegistry Core]:
+
+| xRegistry attribute | Type | Description |
+|---|---|---|
+| `sourceurl` | `url` | Base URL of the server these packages were projected from, for example `https://pub.dev`. Provenance only. |
 
 ## 6. Resource: `package`
 

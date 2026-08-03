@@ -1,4 +1,14 @@
 # Model Context Protocol Server Registry Mapping - Version 1.0-rc1
+<!-- words: additionalproperties containerregistries dnx dotnetregistries -->
+<!-- words: environmentvariables filepath homepage islatest isrepeated -->
+<!-- words: isrequired issecret lifecycles lowercasing mcp mcpb mcpprovider -->
+<!-- words: mcpproviderid mcpproviders mcpproviderscount mcpprovidersurl -->
+<!-- words: mimetype modelcontextprotocol namespace nodescopes npx nuget -->
+<!-- words: packagearguments packagexid publishedat pypi pythonregistries -->
+<!-- words: registrybaseurl registrytype remotes runtimearguments -->
+<!-- words: runtimehint serverid servername serverscount serversurl sse -->
+<!-- words: statuschangedat statusmessage stdio streamable subfolder -->
+<!-- words: templated updatedat uvx valuehint website websiteurl xh -->
 
 ## Abstract
 

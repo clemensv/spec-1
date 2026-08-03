@@ -1,4 +1,8 @@
 # RubyGems Registry Mapping - Version 1.0-rc1
+<!-- words: changelog gemspec homepage jruby licenseref linux mfa nokogiri -->
+<!-- words: packageid packagescount packagesurl prereqs rubygems -->
+<!-- words: rubyregistries rubyregistriescount rubyregistriesurl -->
+<!-- words: rubyregistry rubyregistryid rz sigstore sourceurl spdx wiki xh -->
 
 ## Abstract
 
@@ -17,6 +21,7 @@ terms of the xRegistry document format and API [specification][xRegistry Core].
 - [3. Registry Model](#3-registry-model)
 - [4. Identity Mapping](#4-identity-mapping)
   - [4.1. Group Identity](#41-group-identity)
+    - [4.1.1. Projection Identity Rules](#411-projection-identity-rules)
   - [4.2. Resource Identity](#42-resource-identity)
   - [4.3. Version Identity and Platform Builds](#43-version-identity-and-platform-builds)
   - [4.4. Timestamps](#44-timestamps)
@@ -113,7 +118,7 @@ this form:
   "rubyregistriesurl": "<URL>",
   "rubyregistriescount": <UINTEGER>,
   "rubyregistries": {
-    "<KEY>": {                                  # rubyregistryid, rubygems.org
+    "<KEY>": {                                  # rubyregistryid, rubygems
       "rubyregistryid": "<STRING>",             # xRegistry core attributes
       "self": "<URL>",
       "shortself": "<URL>", ?
@@ -125,6 +130,8 @@ this form:
       "labels": { "<STRING>": "<STRING>" * }, ?
       "createdat": "<TIMESTAMP>",
       "modifiedat": "<TIMESTAMP>",
+
+      "sourceurl": "<URL>", ?                  # base URL of this gem source
 
       "packagesurl": "<URL>",
       "packagescount": <UINTEGER>,
@@ -149,7 +156,7 @@ this form:
           # Start of package extension attributes
           "info": "<STRING>", ?                 # gemspec summary (one line)
           "version": "<STRING>", ?              # latest stable version
-          "number": "<STRING>", ?               # raw version of this Version
+          "number": "<STRING>", ?               # normalized version, no '-'
           "platform": "<STRING>", ?             # e.g. ruby, java, x86_64-linux
           "full_name": "<STRING>", ?            # e.g. nokogiri-1.19.4-java
           "authors": "<STRING>", ?              # comma-separated
@@ -193,7 +200,7 @@ this form:
             # ... xRegistry core Meta attributes ...
 
             # Package-wide meta attributes
-            "project_uri": "<STRING>", ?        # registry-synthesised URL
+            "project_uri": "<STRING>", ?        # registry-synthesized URL
             "downloads": <UINTEGER>, ?          # total across all versions
             "reverse_dependencies": [ "<STRING>" * ] ?
           }, ?
@@ -211,8 +218,44 @@ this form:
 
 ### 4.1. Group Identity
 
-The `rubyregistryid` MUST identify the gem registry, for example
-`rubygems.org`.
+A Group is one **projection** of an ecosystem's package metadata into
+xRegistry. The `rubyregistryid` names that projection. For gems projected from
+the RubyGems metadata model the `rubyregistryid` MUST be `rubygems`.
+
+The identifier is deliberately not a source, a host or an account. A registry
+that serves gems from the public source, from a mirror, from an internal proxy
+or from a private source uses the same `rubygems` Group, so that
+`/rubyregistries/rubygems/packages/<packageid>` denotes the same gem wherever it
+is served.
+
+See [Section 4.1.1](#411-projection-identity-rules) for the rules that govern
+this identifier.
+
+#### 4.1.1. Projection Identity Rules
+
+- The identifier MUST be stable across every deployment that serves the same
+  projection, and MUST NOT vary by serving host, tenancy or access level. An
+  implementation MUST NOT derive it from a DNS name, a URL authority or an
+  account name. This is what allows one registry to shadow another: a gem
+  served from an air-gapped mirror MUST present the same path as the same gem
+  served from the public source.
+- Where RubyGems introduces a metadata model that cannot be projected into the
+  attributes defined in this specification without loss or contradiction, that
+  model MUST be given a new Group identifier, for example `rubygems-v2`. Both
+  Groups MAY then coexist in one registry, and a client selects the model it
+  understands instead of being handed attributes whose meaning has silently
+  changed.
+- Where two parties project this ecosystem under incompatible interpretations,
+  each MUST use a distinct Group identifier. A Group therefore identifies the
+  ecosystem together with the reading of it that produced the entries, and two
+  entries in the same Group are directly comparable.
+
+Access control is a property of the registry deployment rather than of the
+identifier. A registry that exposes only a private source's gems still exposes
+them under `rubygems`, and MAY omit entries the caller is not entitled to see; a
+caller MUST NOT infer from an entry's absence that it does not exist upstream.
+Where entries drawn from different sources are served together, the `sourceurl`
+attribute records which service each Group's entries were projected from.
 
 ### 4.2. Resource Identity
 
@@ -233,6 +276,19 @@ RubyGems publishes a *(version, platform)* pair, not a bare version. The
 |---|---|---|
 | `ruby` | The version number alone | `1.19.4` |
 | any other | `<version>-<platform>` | `1.19.4-x86_64-linux` |
+
+The version component MUST be the normalized RubyGems version string, which is
+the value `Gem::Version` yields and the value the registry API serves. That
+normalization is what makes this mapping unambiguous. `Gem::Version` rewrites a
+SemVer-style prerelease hyphen to `.pre.`, so the input `1.0.0-java` is stored
+and served as `1.0.0.pre.java`. A published version number therefore never
+contains `-`, whereas a composed `versionid` always does; the two forms cannot
+be confused, and the first `-` always separates version from platform.
+
+An implementation MUST NOT compose the `versionid` from an unnormalized version
+string. Doing so reintroduces the collision this rule exists to prevent: the raw
+pair *(`1.0.0-java`, `ruby`)* and the raw pair *(`1.0.0`, `java`)* would both
+yield `1.0.0-java`, silently merging two distinct published builds.
 
 Only `ruby` collapses to the bare version, because `ruby` is the single default
 platform: the RubyGems compact index encodes a release as `VERSION[-PLATFORM]`
@@ -261,10 +317,11 @@ circumstance.
 
 The `versionid` is an identifier, not an encoding, and consumers MUST NOT
 attempt to recover the upstream tuple from it. The raw components MUST be
-preserved: `number` carries the version string exactly as published, and
-`platform` carries the platform string exactly as published. Consumers requiring
-the true upstream tuple — in particular to address RubyGems.org itself — MUST
-read those attributes rather than parsing `versionid`.
+preserved: `number` carries the normalized version string exactly as the
+registry serves it, and `platform` carries the platform string exactly as
+published. Consumers requiring the true upstream tuple — in particular to
+address RubyGems.org itself — MUST read those attributes rather than parsing
+`versionid`.
 
 ### 4.4. Timestamps
 
@@ -275,11 +332,17 @@ most recent change to the projected metadata.
 ## 5. Group: `rubyregistry`
 
 The Group (`<GROUP>`) name is `rubyregistry` (singular); the plural, used as the
-collection name, is `rubyregistries`. A `rubyregistry` represents one Ruby gem
-registry provider.
+collection name, is `rubyregistries`. A `rubyregistry` represents one
+projection of the RubyGems metadata model into xRegistry. Its identifier names
+that projection rather than the service that serves it. See
+[Section 4.1](#41-group-identity) for how the identifier is formed.
 
-This extension defines no Group-level extension attributes beyond those
-inherited from [xRegistry Core][xRegistry Core].
+This extension defines the following Group-level extension attributes, in
+addition to those inherited from [xRegistry Core][xRegistry Core]:
+
+| xRegistry attribute | Type | Description |
+|---|---|---|
+| `sourceurl` | `url` | Base URL of the source these gems were projected from, for example `https://rubygems.org`. Provenance only. |
 
 ## 6. Resource: `package`
 
@@ -310,7 +373,7 @@ the collection name, is `packages`.
 
 | xRegistry attribute | Type | Description |
 |---|---|---|
-| `number` | `string` | The raw version string exactly as published to RubyGems. |
+| `number` | `string` | The normalized version string exactly as served by RubyGems, for example `1.0.0.pre.java`. Never contains `-`. |
 | `prerelease` | `boolean` | Whether the version is a pre-release. |
 | `created_at` | `timestamp` | RFC 3339 timestamp at which the registry published the version. |
 | `built_at` | `timestamp` | RFC 3339 timestamp recorded in the gemspec at build time. It is asserted by the publisher and MAY differ from `created_at`. |
@@ -395,7 +458,7 @@ These named attributes duplicate, and do not replace, the corresponding entries
 in `metadata`. Where both are populated they MUST carry the same value.
 
 `project_uri` is deliberately **not** listed here. It is not a gemspec metadata
-key and is not declared by the publisher: the registry synthesises it from the
+key and is not declared by the publisher: the registry synthesizes it from the
 gem name, as `https://rubygems.org/gems/<gem>` on RubyGems.org. It is therefore
 a package-wide, registry-owned URL and is modelled as a Meta attribute in
 [6.6](#66-meta-attributes).
@@ -408,7 +471,7 @@ the gem as a whole rather than any single Version:
 | xRegistry attribute | Type | Description |
 |---|---|---|
 | `owners` | `array` of `object` | The users who may push the gem, each with a `handle` and a `role` of `owner` or `maintainer`. |
-| `project_uri` | `string` | The gem's page on the registry. Synthesised by the registry from the gem name, not declared by the publisher. |
+| `project_uri` | `string` | The gem's page on the registry. Synthesized by the registry from the gem name, not declared by the publisher. |
 | `downloads` | `integer` | Cumulative download count across all versions and platforms. |
 | `reverse_dependencies` | `array` of `string` | Names of gems that declare a dependency on this gem. |
 

@@ -21,6 +21,11 @@
           "singular": "package",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The canonical npm package name, verbatim and unaltered, including the leading '@scope/' for scoped packages. This is the authoritative name of the package; the packageid is only an addressing key and omits the scope, which is promoted to the Group."
+            },
             "license": {
               "type": "string",
               "description": "The license under which the package is distributed."

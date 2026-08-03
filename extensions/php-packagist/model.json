@@ -11,6 +11,11 @@
           "singular": "package",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The canonical Composer 'vendor/package' name, verbatim and unaltered including the '/' separator. This is the authoritative name of the package; the packageid is only an addressing key and omits the vendor, which is promoted to the Group."
+            },
             "type": {
               "type": "string",
               "description": "The package type (e.g., library, project, symfony-bundle)."

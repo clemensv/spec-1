@@ -1,4 +1,9 @@
 # Go Module Proxy Mapping - Version 1.0-rc1
+<!-- words: abcdef biblepassageapi burntsushi dirhash filesystems godebug -->
+<!-- words: golang gomod goproxy goregistries goregistriescount -->
+<!-- words: goregistriesurl goregistry goregistryid lowercasing moduleid -->
+<!-- words: modulepath modulescount modulesurl mvs namespace namespaces -->
+<!-- words: panicnil toml toolchain vcs vn xh -->
 
 ## Abstract
 
@@ -337,9 +342,14 @@ whose grammar admits only ASCII alphanumerics, `.`, `-` and `+`, so the
 substitution is collision-free while leaving the identifier readable.
 
 The `versionid` is an identifier, not an encoding, and consumers MUST NOT
-attempt to recover the upstream version from it. The Version's `name` attribute
-MUST carry the canonical Go version string exactly, and consumers addressing a
-module proxy MUST read `name`.
+attempt to recover the upstream version from it. The `version` attribute MUST
+carry the canonical Go version string exactly, and consumers addressing a
+module proxy MUST read `version`.
+
+The upstream version string is carried in `version` rather than in `name`
+because xRegistry Core defines a single `name` per entity, and this extension
+already binds `name` to the canonical module path
+([Section 4.2](#42-resource-identity)). A Version cannot name both.
 
 Go module versions are immutable. Implementations MUST report published versions
 as immutable Versions.

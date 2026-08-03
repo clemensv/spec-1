@@ -7,6 +7,12 @@
       "description": "A group representing a Ruby gem registry provider (e.g., rubygems.org).",
       "plural": "rubyregistries",
       "singular": "rubyregistry",
+      "attributes": {
+        "sourceurl": {
+          "type": "url",
+          "description": "Base URL of the gem source from which these gems were projected, e.g. 'https://rubygems.org'. This records provenance only; a gem name denotes the same gem whichever source serves it."
+        }
+      },
       "resources": {
         "packages": {
           "description": "A Ruby gem in the registry, including its metadata and available versions.",
@@ -14,6 +20,11 @@
           "singular": "package",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The canonical gem name exactly as published. This is the authoritative name of the gem; the packageid is only an addressing key derived from it."
+            },
             "info": {
               "type": "string",
               "description": "The gemspec 'summary': a one-line summary of the gem. The RubyGems JSON API returns this under the name 'info'. This is NOT the gemspec 'description'; see the separate 'description' attribute."

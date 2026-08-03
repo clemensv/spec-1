@@ -8,7 +8,7 @@ verify: spellcheck ticks badhrefs tabcheck errorcheck samplescheck hrefs \
 
 spellcheck:
 	@echo "Checking for spelling mistakes:"
-	tools/spellcheck */README.md */spec.md core/*.md \
+	tools/spellcheck */README.md */spec.md */*/spec.md core/*.md \
 		docs/share/README.md */samples/README.md */samples/*/README.md
 	@echo
 

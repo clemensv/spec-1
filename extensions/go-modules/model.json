@@ -56,6 +56,16 @@
             }
           },
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The canonical Go module path, verbatim and unaltered, including any major-version suffix (e.g. 'github.com/pkg/errors', 'example.com/m/v2'). This is the authoritative name of the module; the moduleid is only an addressing key derived from it and MUST NOT be reversed to recover this value."
+            },
+            "version": {
+              "type": "string",
+              "required": true,
+              "description": "The canonical Go version string exactly as published, including the leading 'v' and any '+incompatible' build metadata (e.g. 'v2.0.0+incompatible'). This is the authoritative version; the versionid is a transliteration of it and MUST NOT be reversed."
+            },
             "modulepath": {
               "type": "string",
               "description": "The canonical Go module path reconstructed from the group and module identity, including any major-version suffix."

@@ -451,9 +451,15 @@
             }
           },
           "metaattributes": {
+            "group_id": {
+              "type": "string",
+              "required": true,
+              "description": "Maven groupId, verbatim and unaltered. This is the authoritative group of the package. It is normally identical to the javanamespaceid, but not when that identifier has been hashed to resolve a case-insensitive collision, so a consumer addressing Maven Central MUST read this attribute rather than the enclosing Group identifier."
+            },
             "artifact_id": {
               "type": "string",
-              "description": "Maven artifactId. This is the Resource's identity within its namespace and is therefore constant across all Versions."
+              "required": true,
+              "description": "Maven artifactId, verbatim and unaltered. This is the Resource's identity within its namespace and is therefore constant across all Versions. It is the authoritative artifact name; the packageid MAY be a hash where two artifactIds collide case-insensitively."
             }
           }
         }

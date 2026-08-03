@@ -11,6 +11,11 @@
           "description": "A Hugging Face model whose resource ID is the repository basename within its owner group.",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The full Hub repository identity in 'owner/name' form, verbatim and unaltered including the '/' separator. This is the authoritative name of the repository; the modelid is only the basename and does not identify the repository on its own."
+            },
             "repoid": {
               "type": "string",
               "description": "Full Hugging Face repository ID (owner/name or name), taken from the Hub 'id' field."
@@ -279,6 +284,11 @@
           "description": "A Hugging Face dataset whose resource ID is the repository basename within its owner group.",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The full Hub repository identity in 'owner/name' form, verbatim and unaltered including the '/' separator. This is the authoritative name of the repository; the datasetid is only the basename and does not identify the repository on its own."
+            },
             "repoid": {
               "type": "string",
               "description": "Full Hugging Face repository ID (owner/name or name), taken from the Hub 'id' field."
@@ -479,6 +489,11 @@
           "description": "A Hugging Face space whose resource ID is the repository basename within its owner group.",
           "hasdocument": false,
           "attributes": {
+            "name": {
+              "type": "string",
+              "required": true,
+              "description": "The full Hub repository identity in 'owner/name' form, verbatim and unaltered including the '/' separator. This is the authoritative name of the repository; the spaceid is only the basename and does not identify the repository on its own."
+            },
             "repoid": {
               "type": "string",
               "description": "Full Hugging Face repository ID (owner/name), taken from the Hub 'id' field."

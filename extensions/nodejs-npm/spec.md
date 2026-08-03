@@ -1,4 +1,10 @@
 # npm Package Registry Mapping - Version 1.0-rc1
+<!-- words: bundledependencies devdependencies filecount homepage -->
+<!-- words: installability installable linux nodescope nodescopeid -->
+<!-- words: nodescopes nodescopescount nodescopesurl npmjs npmrc -->
+<!-- words: optionaldependencies packageid packagescount packagesurl -->
+<!-- words: packuments peerdependencies pgp replacedby shasum sourceurl -->
+<!-- words: spdx subresource tarball unpackedsize unscoped xh -->
 
 ## Abstract
 
