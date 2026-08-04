@@ -183,7 +183,7 @@ adheres to this form:
 
           # Dependency relations: package name -> Composer constraint expression
           "require": { "<STRING>": "<STRING>" * }, ?
-          "require-dev": { "<STRING>": "<STRING>" * }, ?
+          "require_dev": { "<STRING>": "<STRING>" * }, ?
           "conflict": { "<STRING>": "<STRING>" * }, ?
           "replace": { "<STRING>": "<STRING>" * }, ?
           "provide": { "<STRING>": "<STRING>" * }, ?
@@ -202,7 +202,7 @@ adheres to this form:
           }, ?
 
           "autoload": <ANY>, ?
-          "autoload-dev": <ANY>, ?
+          "autoload_dev": <ANY>, ?
           "bin": [ "<STRING>" * ], ?
           "scripts": <ANY>, ?                   # event -> string or [string]
           "support": {
@@ -239,7 +239,7 @@ adheres to this form:
             "favers": <UINTEGER>, ?
             "currentversion": "<STRING>", ?     # raw version shown on the Resource
             "readme": "<STRING>", ?
-            "default-branch": "<STRING>" ?
+            "default_branch": "<STRING>" ?
           }, ?
           "versionsurl": "<URL>",
           "versionscount": <UINTEGER>,
@@ -411,16 +411,16 @@ because each has different resolver semantics:
 | xRegistry attribute | Type | Semantics |
 |---|---|---|
 | `require` | `map` of `string` | Packages that MUST be installed alongside this one. |
-| `require-dev` | `map` of `string` | Packages needed only when developing this package. |
+| `require_dev` | `map` of `string` | Packages needed only when developing this package. |
 | `conflict` | `map` of `string` | Versions of other packages that MUST NOT be installed alongside this one. |
 | `replace` | `map` of `string` | Packages this one replaces; installing this satisfies those names. |
 | `provide` | `map` of `string` | Virtual package names this package implements. |
 | `suggest` | `map` of `string` | Packages suggested to the consumer but not installed. |
 
-All six carry the upstream `composer.json` field name verbatim, including the
-hyphen in `require-dev`. `-` is a legal character in an xRegistry extension
-attribute name, so renaming it would be gratuitous and would force consumers to
-maintain a translation table for a single field.
+Five of the six carry the upstream `composer.json` field name verbatim.
+`require-dev` cannot, because xRegistry attribute names are restricted to
+`[a-z0-9_]`, so it is projected as `require_dev`. The rename is confined to the
+attribute name; the map keys and values are untouched.
 
 Each is a `map` whose keys are package names. This is the exact upstream shape,
 so the attributes are structurally typed rather than opaque. The map *values*
@@ -468,11 +468,11 @@ only value distinguishing one materialization of the alias from another.
 | xRegistry attribute | Type | `composer.json` field | Description |
 |---|---|---|---|
 | `autoload` | `any` | `autoload` | Autoload rules in the upstream representation. |
-| `autoload-dev` | `any` | `autoload-dev` | Autoload rules applied only when developing this package, e.g. for the test suite. |
+| `autoload_dev` | `any` | `autoload-dev` | Autoload rules applied only when developing this package, e.g. for the test suite. |
 | `bin` | `array` of `string` | `bin` | Package-relative paths to executables Composer links into the vendor binary directory. |
 | `scripts` | `any` | `scripts` | Event hooks, keyed by Composer event name. |
 
-`autoload` and `autoload-dev` are typed `any` and are structured identically to
+`autoload` and `autoload_dev` are typed `any` and are structured identically to
 each other. Both are genuinely union-typed: under `psr-4` and `psr-0` a
 namespace prefix maps either to a single path string or to an array of path
 strings, while `classmap`, `files` and `exclude-from-classmap` are arrays. A
@@ -513,14 +513,14 @@ the package as a whole:
 | `favers` | `uinteger` | Number of users who have marked the package as a favorite. |
 | `currentversion` | `string` | The raw Composer version selected for display on the Resource. |
 | `readme` | `string` | The rendered package README as published by Packagist. |
-| `default-branch` | `string` | The VCS branch Packagist treats as the package default, e.g. `main`. |
+| `default_branch` | `string` | The VCS branch Packagist treats as the package default, e.g. `main`. |
 
 Download counts and favorite counts are cardinalities and can never be
 negative, so they are typed `uinteger` rather than `integer`.
 
-`readme` and `default-branch` are Resource-level rather than Version-level:
+`readme` and `default_branch` are Resource-level rather than Version-level:
 Packagist publishes exactly one of each per package, not one per release.
-`default-branch` names the branch whose `dev-` alias is the package's moving
+`default_branch` names the branch whose `dev-` alias is the package's moving
 head; it is a branch name, not a `versionid`.
 
 ## 7. Conformance

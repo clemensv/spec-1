@@ -1,12 +1,10 @@
 {
   "groups": {
     "huggingfaceregistries": {
-      "plural": "huggingfaceregistries",
       "singular": "huggingfaceregistry",
       "description": "A Hugging Face owner namespace; _ is reserved for unnamespaced repositories.",
       "resources": {
         "models": {
-          "plural": "models",
           "singular": "model",
           "description": "A Hugging Face model whose resource ID is the repository basename within its owner group.",
           "hasdocument": false,
@@ -279,7 +277,6 @@
           }
         },
         "datasets": {
-          "plural": "datasets",
           "singular": "dataset",
           "description": "A Hugging Face dataset whose resource ID is the repository basename within its owner group.",
           "hasdocument": false,
@@ -484,7 +481,6 @@
           }
         },
         "spaces": {
-          "plural": "spaces",
           "singular": "space",
           "description": "A Hugging Face space whose resource ID is the repository basename within its owner group.",
           "hasdocument": false,

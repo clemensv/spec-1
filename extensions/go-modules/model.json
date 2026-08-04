@@ -2,12 +2,10 @@
   "groups": {
     "goregistries": {
       "description": "A Go module namespace identified by the first component of a canonical module path (for example github.com or golang.org).",
-      "plural": "goregistries",
       "singular": "goregistry",
       "resources": {
         "modules": {
           "description": "A Go module available in the registry, including its metadata and published versions.",
-          "plural": "modules",
           "singular": "module",
           "hasdocument": false,
           "metaattributes": {

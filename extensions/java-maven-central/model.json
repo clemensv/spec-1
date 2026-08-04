@@ -1,7 +1,6 @@
 {
   "groups": {
     "javanamespaces": {
-      "plural": "javanamespaces",
       "singular": "javanamespace",
       "description": "Maven namespaces. A namespace is a verified Maven groupId: publishing rights to a groupId are granted only after the publisher proves control of the corresponding DNS domain or code-hosting account, so the namespace identifies the publishing organization uniquely across Maven Central.",
       "attributes": {
@@ -18,7 +17,6 @@
       "resources": {
         "packages": {
           "singular": "package",
-          "plural": "packages",
           "description": "Maven packages (artifacts)",
           "hasdocument": false,
           "attributes": {

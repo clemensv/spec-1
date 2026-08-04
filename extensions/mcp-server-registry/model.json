@@ -1,12 +1,10 @@
 {
   "groups": {
     "mcpproviders": {
-      "plural": "mcpproviders",
       "singular": "mcpprovider",
       "description": "Registry of Model Context Protocol (MCP) servers and their capabilities, organized by provider.",
       "resources": {
         "servers": {
-          "plural": "servers",
           "singular": "server",
           "maxversions": 0,
           "setversionid": true,
@@ -72,8 +70,7 @@
                           "packagexid": {
                             "name": "packagexid",
                             "type": "xid",
-                            "description": "xRegistry ID referencing the NPM package.",
-                            "target": "/nodescopes/packages"
+                            "description": "xRegistry ID referencing the NPM package. Targets /nodescopes/packages, defined by the npm extension; the target is not declared here because that Group is not part of this model."
                           }
                         }
                       },
@@ -82,8 +79,7 @@
                           "packagexid": {
                             "name": "packagexid",
                             "type": "xid",
-                            "description": "xRegistry ID referencing the PyPI package.",
-                            "target": "/pythonregistries/packages"
+                            "description": "xRegistry ID referencing the PyPI package. Targets /pythonregistries/packages, defined by the PyPI extension; the target is not declared here because that Group is not part of this model."
                           }
                         }
                       },
@@ -92,8 +88,7 @@
                           "packagexid": {
                             "name": "packagexid",
                             "type": "xid",
-                            "description": "xRegistry ID referencing the container image.",
-                            "target": "/containerregistries/images"
+                            "description": "xRegistry ID referencing the container image. Targets /containerregistries/images, defined by the OCI extension; the target is not declared here because that Group is not part of this model."
                           }
                         }
                       },
@@ -102,8 +97,7 @@
                           "packagexid": {
                             "name": "packagexid",
                             "type": "xid",
-                            "description": "xRegistry ID referencing the NuGet package.",
-                            "target": "/dotnetregistries/packages"
+                            "description": "xRegistry ID referencing the NuGet package. Targets /dotnetregistries/packages, defined by the NuGet extension; the target is not declared here because that Group is not part of this model."
                           }
                         }
                       },

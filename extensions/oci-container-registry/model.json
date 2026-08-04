@@ -9,12 +9,10 @@
           "description": "Base URL of the OCI Distribution API from which these images were projected, e.g. 'https://registry-1.docker.io/v2/'. This records provenance only; a repository name denotes the same repository whichever registry serves it."
         }
       },
-      "plural": "containerregistries",
       "singular": "containerregistry",
       "resources": {
         "images": {
           "description": "A resource representing a container image in the registry, including its metadata and available tags/versions.",
-          "plural": "images",
           "singular": "image",
           "maxversions": 0,
           "setversionid": true,

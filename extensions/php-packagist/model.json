@@ -2,12 +2,10 @@
   "groups": {
     "composerregistries": {
       "description": "A Composer vendor namespace discovered on Packagist.",
-      "plural": "composerregistries",
       "singular": "composerregistry",
       "resources": {
         "packages": {
           "description": "A Composer package whose resource ID is its package basename within the vendor group.",
-          "plural": "packages",
           "singular": "package",
           "hasdocument": false,
           "attributes": {
@@ -97,7 +95,7 @@
               },
               "description": "Runtime dependencies, keyed by package name. Values are raw Composer version constraint expressions and MUST be preserved verbatim."
             },
-            "require-dev": {
+            "require_dev": {
               "type": "map",
               "item": {
                 "type": "string"
@@ -166,7 +164,7 @@
               "type": "any",
               "description": "Autoload rules in the upstream Composer representation. Genuinely union-typed: PSR-4 and PSR-0 entries map a prefix to a string or an array of strings, while classmap and files are arrays."
             },
-            "autoload-dev": {
+            "autoload_dev": {
               "type": "any",
               "description": "Development-only autoload rules, structured identically to autoload and applied only when developing this package."
             },
@@ -300,7 +298,7 @@
               "type": "string",
               "description": "The rendered package README as published by Packagist. Package-wide, not per-Version."
             },
-            "default-branch": {
+            "default_branch": {
               "type": "string",
               "description": "The VCS branch Packagist treats as the package default, e.g. main or master. Package-wide, not per-Version."
             }

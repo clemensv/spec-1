@@ -1,7 +1,6 @@
 {
   "groups": {
     "dotnetregistries": {
-      "plural": "dotnetregistries",
       "singular": "dotnetregistry",
       "description": "Groups of .NET package registries",
       "attributes": {
@@ -50,7 +49,6 @@
       "resources": {
         "packages": {
           "singular": "package",
-          "plural": "packages",
           "description": "NuGet packages",
           "hasdocument": false,
           "attributes": {

@@ -1,11 +1,8 @@
 {
-  "specversion": "1.0-rc2",
-  "registryid": "rubygems-wrapper",
   "description": "The xRegistry model for the RubyGems wrapper, describing the structure and metadata for Ruby gem registries and packages.",
   "groups": {
     "rubyregistries": {
       "description": "A group representing a Ruby gem registry provider (e.g., rubygems.org).",
-      "plural": "rubyregistries",
       "singular": "rubyregistry",
       "attributes": {
         "sourceurl": {
@@ -16,7 +13,6 @@
       "resources": {
         "packages": {
           "description": "A Ruby gem in the registry, including its metadata and available versions.",
-          "plural": "packages",
           "singular": "package",
           "hasdocument": false,
           "attributes": {

@@ -2,12 +2,10 @@
   "groups": {
     "terraformregistries": {
       "description": "A Terraform namespace on the configured registry host.",
-      "plural": "terraformregistries",
       "singular": "terraformregistry",
       "resources": {
         "providers": {
           "description": "A Terraform provider. The resource ID is its provider type within the namespace group. Populated from the provider registry protocol, discovered through the 'providers.v1' service discovery identifier.",
-          "plural": "providers",
           "singular": "provider",
           "hasdocument": false,
           "attributes": {
@@ -185,7 +183,6 @@
         },
         "modules": {
           "description": "A Terraform module. The resource ID is name~provider within the namespace group, or a hashed form where that is not available. Populated from the module registry protocol, discovered through the 'modules.v1' service discovery identifier.",
-          "plural": "modules",
           "singular": "module",
           "hasdocument": false,
           "attributes": {

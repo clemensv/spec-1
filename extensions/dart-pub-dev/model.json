@@ -3,7 +3,6 @@
   "groups": {
     "dartregistries": {
       "description": "A group representing a Dart/Flutter package registry provider (e.g., pub.dev). Contains all available Dart package registries.",
-      "plural": "dartregistries",
       "singular": "dartregistry",
       "attributes": {
         "sourceurl": {
@@ -14,7 +13,6 @@
       "resources": {
         "packages": {
           "description": "A resource representing a Dart/Flutter package in the registry, including its metadata and available versions.",
-          "plural": "packages",
           "singular": "package",
           "hasdocument": false,
           "attributes": {

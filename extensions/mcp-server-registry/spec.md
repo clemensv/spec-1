@@ -481,6 +481,11 @@ npm, PyPI, OCI and NuGet extensions in this repository. Where an xRegistry
 deployment federates those extensions with this one, `packagexid` resolves to a
 live Resource and the MCP catalogue becomes navigable into the package graph.
 
+The targets are not declared as `target` values in this extension's model,
+because a `target` MUST name a Group type present in the same model document and
+these Groups belong to sibling extensions. A deployment that federates the
+models MAY add the `target` values shown above.
+
 `mcpb` is typed `uri` rather than `xid` because an MCP bundle has no
 corresponding package-registry extension; it is referenced by location.
 

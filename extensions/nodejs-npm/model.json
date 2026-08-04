@@ -2,7 +2,6 @@
   "groups": {
     "nodescopes": {
       "description": "An npm scope. A scope is the namespace granted to an npm user account or organization, and it is what allows two publishers to use the same package name without conflict. The reserved scope '_' holds the unscoped, flat global namespace, in which a bare package name is unique across all publishers.",
-      "plural": "nodescopes",
       "singular": "nodescope",
       "attributes": {
         "scope": {
@@ -17,7 +16,6 @@
       "resources": {
         "packages": {
           "description": "A Node.js package in the registry, including its metadata and available versions.",
-          "plural": "packages",
           "singular": "package",
           "hasdocument": false,
           "attributes": {
@@ -74,7 +72,7 @@
                   "type": "uinteger",
                   "description": "Total size in bytes of the tarball contents once unpacked. Projects npm 'unpackedSize'."
                 },
-                "npm-signature": {
+                "npm_signature": {
                   "type": "string",
                   "description": "Detached PGP signature over the package name, version and integrity value, as issued by the registry."
                 }
@@ -142,7 +140,7 @@
               "type": "string",
               "description": "Current version of the package."
             },
-            "dist-tags": {
+            "dist_tags": {
               "type": "object",
               "description": "Distribution tags for the package (latest, next, etc)."
             },

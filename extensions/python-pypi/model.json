@@ -3,7 +3,6 @@
   "groups": {
     "pythonregistries": {
       "description": "A group representing a Python package registry provider (e.g., pypi.org). Contains all available Python package registries.",
-      "plural": "pythonregistries",
       "singular": "pythonregistry",
       "attributes": {
         "sourceurl": {
@@ -14,7 +13,6 @@
       "resources": {
         "packages": {
           "description": "A resource representing a Python package in the registry, including its metadata and available versions.",
-          "plural": "packages",
           "singular": "package",
           "hasdocument": false,
           "attributes": {

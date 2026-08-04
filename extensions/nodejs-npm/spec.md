@@ -170,7 +170,7 @@ adheres to this form:
             "integrity": "<STRING>", ?
             "file_count": <UINTEGER>, ?
             "unpacked_size": <UINTEGER>, ?
-            "npm-signature": "<STRING>" ?
+            "npm_signature": "<STRING>" ?
           },
           "license": "<STRING>", ?
           "author": {                           # person object
@@ -187,7 +187,7 @@ adheres to this form:
           "keywords": [ "<STRING>" * ], ?
           "maintainers": [ { <PERSON> } * ], ?
           "contributors": [ { <PERSON> } * ], ?
-          "dist-tags": { "<STRING>": "<STRING>" * }, ?  # e.g. latest, next
+          "dist_tags": { "<STRING>": "<STRING>" * }, ?  # e.g. latest, next
           "deprecated_message": "<STRING>", ?
 
           "dependencies": [
@@ -349,7 +349,7 @@ attributes declared in [`model.json`](model.json).
 | `engines` | `object` | `engines` | Runtime version constraints, principally `node`. |
 | `os` | `array` of `string` | `os` | Permitted operating systems, see [6.4](#64-installability-constraints). |
 | `cpu` | `array` of `string` | `cpu` | Permitted CPU architectures, see [6.4](#64-installability-constraints). |
-| `dist-tags` | `object` | `dist-tags` | Mutable tag-to-version aliases as published by the registry. |
+| `dist_tags` | `object` | `dist-tags` | Mutable tag-to-version aliases as published by the registry. |
 | `deprecated_message` | `string` | `deprecated` | Deprecation notice; presence indicates the package or version is deprecated. |
 | `dependencies` | `array` of `object` | `dependencies` | Runtime dependencies, see [6.2](#62-dependency-cross-references). |
 | `dev_dependencies` | `array` of `object` | `devDependencies` | Development-time dependencies. |
@@ -363,11 +363,12 @@ the camel-cased npm field names `devDependencies`, `peerDependencies`,
 `optionalDependencies` and `bundleDependencies` cannot be used verbatim. They
 are projected as `dev_dependencies`, `peer_dependencies`,
 `optional_dependencies` and `bundle_dependencies` respectively; the same rule
-applies to `fileCount` and `unpackedSize` within `dist`. `dist-tags` and
-`dist.npm-signature` are retained under their upstream hyphenated names, which
-are permitted by the extended attribute name character set. Implementations
-MUST NOT rename `dist-tags`, because the value is a verbatim projection of the
-registry document and clients match tag names against it.
+applies to `fileCount` and `unpackedSize` within `dist`. The hyphen is likewise
+outside the permitted set, so the upstream `dist-tags` and `dist.npm-signature`
+field names are projected as `dist_tags` and `dist.npm_signature`. The rename
+applies to the attribute name only; the *keys* within `dist_tags` are map keys,
+not attribute names, and implementations MUST reproduce them verbatim from the
+registry document, because clients match tag names against them.
 
 npm's `deprecated` field is projected as `deprecated_message` because
 `deprecated` is a spec-defined xRegistry attribute of type object. When the npm
@@ -430,7 +431,7 @@ sub-attribute.
 | `integrity` | `string` | `dist.integrity` | Subresource Integrity string, e.g. `sha512-…`. |
 | `file_count` | `uinteger` | `dist.fileCount` | Number of files in the tarball. |
 | `unpacked_size` | `uinteger` | `dist.unpackedSize` | Size in bytes of the tarball contents once unpacked. |
-| `npm-signature` | `string` | `dist.npm-signature` | Detached PGP signature over the name, version and integrity value. |
+| `npm_signature` | `string` | `dist.npm-signature` | Detached PGP signature over the name, version and integrity value. |
 
 `shasum` is present on every published version and `integrity` is present for
 versions published by npm 5 and later; an implementation MUST project whichever
@@ -439,7 +440,7 @@ consumer verifying a download SHOULD prefer `integrity` where both are present.
 
 The `dist` values MUST be projected verbatim. In particular, `tarball` MUST NOT
 be rewritten to point at a mirror or proxy, because `shasum`, `integrity` and
-`npm-signature` are assertions about the bytes served from the recorded URL.
+`npm_signature` are assertions about the bytes served from the recorded URL.
 
 ### 6.4. Installability Constraints
 
