@@ -33,9 +33,9 @@
               "type": "string",
               "description": "Canonical provider source address namespace/type, as written in a Terraform required_providers block."
             },
-            "sourceurl": {
-              "type": "url",
-              "description": "Base URL of the Terraform registry this provider was projected from, e.g. 'https://registry.terraform.io'. This records provenance only and is not part of the provider's identity."
+            "registryhost": {
+              "type": "string",
+              "description": "Upstream Terraform registry host."
             },
             "published_at": {
               "type": "timestamp",
@@ -219,9 +219,9 @@
               "type": "uri",
               "description": "Repository URL of the module, as returned verbatim in the upstream 'source' field (e.g., https://github.com/hashicorp/terraform-aws-consul). It locates the module's source code and is NOT the canonical Terraform source address; see source_address for that."
             },
-            "sourceurl": {
-              "type": "url",
-              "description": "Base URL of the Terraform registry this module was projected from, e.g. 'https://registry.terraform.io'. This records provenance only and is not part of the module's identity."
+            "registryhost": {
+              "type": "string",
+              "description": "Upstream Terraform registry host."
             },
             "download_url": {
               "type": "uri",
@@ -547,9 +547,9 @@
           "type": "string",
           "description": "Canonical Terraform namespace and xRegistry group ID."
         },
-        "sourceurl": {
-          "type": "url",
-          "description": "Base URL of the Terraform registry from which these modules and providers were projected, e.g. 'https://registry.terraform.io'. This records provenance only; a source address denotes the same module or provider whichever registry serves it."
+        "registryhost": {
+          "type": "string",
+          "description": "Upstream Terraform registry host (registry.terraform.io for this proxy)."
         },
         "providers_v1": {
           "type": "string",

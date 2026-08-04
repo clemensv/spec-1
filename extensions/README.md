@@ -3,9 +3,9 @@
 <!-- words: dartregistries dotnet dotnetregistries ghcr goregistries -->
 <!-- words: huggingface huggingfaceregistries javanamespaces mcp -->
 <!-- words: mcpproviders namespace namespaces nodejs nodescopes nuget -->
-<!-- words: packagist php pypi pythonregistries rubygems rubyregistries -->
-<!-- words: rustregistries sourceurl terraform terraformregistries -->
-<!-- words: versionnormalized xh -->
+<!-- words: packagist php pypi pythonregistries registryhost rubygems -->
+<!-- words: rubyregistries rustregistries sourceurl terraform -->
+<!-- words: terraformregistries versionnormalized xh -->
 
 This directory contains specifications that express the metadata of existing
 package, artifact and service registries in terms of
@@ -154,12 +154,14 @@ already used by the npm and Maven Groups. It records provenance and never
 identity, which is also why it can differ between two registries serving the
 same entries.
 
-`sourceurl` is the single name for that idea across every extension here, and it
-is always typed `url`. Where an ecosystem needs per-entry provenance because a
-Group may be assembled from more than one upstream, the same name is reused at
-the Resource level rather than a second name being coined: `containerregistries`
-carries `sourceurl` on an image to record the mirror that actually served it,
-and `terraformregistries` carries it on a module and on a provider.
+`sourceurl` is the default name for that idea, but it does not displace a name
+the ecosystem already has. Terraform keeps `registryhost`, because service
+discovery is defined over a *host* rather than a base URL and the discovery
+document is what supplies the paths; and an OCI image keeps a `registry` meta
+attribute recording the registry that actually served it, because a registry
+name is a syntactic element of an image reference and not a URL. Renaming either
+onto `sourceurl` would have made these mappings read less like the ecosystem
+they describe, for the sake of a consistency no consumer needs.
 
 The remaining Groups are namespaces, even where the name suggests otherwise:
 `goregistries` holds the leading component of a module path,

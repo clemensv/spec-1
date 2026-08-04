@@ -1,7 +1,7 @@
 # Terraform Registry Mapping - Version 1.0-rc1
 <!-- words: azurerm gpg hashicorp hostname installable linux moduleid -->
 <!-- words: modulescount modulesurl namespace namespaces plugin providerid -->
-<!-- words: providerscount providersurl readme shasum shasums sourceurl -->
+<!-- words: providerscount providersurl readme registryhost shasum shasums -->
 <!-- words: terraform terraformregistries terraformregistriescount -->
 <!-- words: terraformregistriesurl terraformregistry terraformregistryid -->
 <!-- words: unlisting vpc xh -->
@@ -155,7 +155,7 @@ this form:
 
       # Group extension attributes
       "namespace": "<STRING>",                  # e.g. hashicorp
-      "sourceurl": "<URL>",                     # e.g. https://registry.terraform.io
+      "registryhost": "<STRING>",               # e.g. registry.terraform.io
       "providers_v1": "<STRING>", ?             # providers.v1 discovery value
       "modules_v1": "<STRING>", ?               # modules.v1 discovery value
 
@@ -183,7 +183,7 @@ this form:
           "namespace": "<STRING>", ?
           "type": "<STRING>", ?                 # e.g. aws
           "source": "<STRING>", ?               # canonical namespace/type
-          "sourceurl": "<URL>", ?
+          "registryhost": "<STRING>", ?
           "published_at": "<TIMESTAMP>", ?      # public-registry extension
           "protocols": [ "<STRING>" * ], ?      # release-level, e.g. 5.0
 
@@ -261,7 +261,7 @@ this form:
           "provider": "<STRING>", ?             # identity, not a dependency
           "source_address": "<STRING>", ?       # namespace/name/provider
           "source": "<URI>", ?                  # repository URL, upstream field
-          "sourceurl": "<URL>", ?
+          "registryhost": "<STRING>", ?
           "download_url": "<URI>", ?            # from X-Terraform-Get
           "published_at": "<TIMESTAMP>", ?
           "providers": [ "<STRING>" * ], ?      # sibling provider systems
@@ -437,12 +437,12 @@ advance it.
 
 The Group identity carries only the namespace, not the registry host. A
 deployment conforming to this specification therefore serves exactly one
-registry host, whose base URL is recorded in the `sourceurl` attribute on the
-Group and on every Resource.
+registry host, recorded in the `registryhost` attribute on the Group and on
+every Resource.
 
 A deployment that aggregates several hosts MUST disambiguate Group identity —
 for example by using collision-free `host~namespace` identifiers — while
-continuing to populate `sourceurl` and `namespace`. It MUST NOT silently
+continuing to populate `registryhost` and `namespace`. It MUST NOT silently
 merge equally-named namespaces originating from different hosts, since they are
 unrelated publishers.
 
@@ -455,7 +455,7 @@ represents one namespace on one registry host.
 | Group attribute | Type | Description |
 |---|---|---|
 | `namespace` | `string` | The canonical Terraform namespace; equal to the `terraformregistryid`. |
-| `sourceurl` | `url` | Base URL of the upstream Terraform registry, e.g. `https://registry.terraform.io`. Provenance only. |
+| `registryhost` | `string` | The upstream Terraform registry host, e.g. `registry.terraform.io`. |
 | `providers_v1` | `string` | The `providers.v1` service discovery value published by the host. |
 | `modules_v1` | `string` | The `modules.v1` service discovery value published by the host. |
 
@@ -474,11 +474,11 @@ document) at which those protocols are served:
 }
 ```
 
-`sourceurl` therefore locates the host, and `providers_v1` and `modules_v1`
+`registryhost` therefore names the host, and `providers_v1` and `modules_v1`
 record what that host advertised. An implementation SHOULD populate them with
 the discovery values verbatim, without resolving them, so that a consumer can
-reconstruct the upstream endpoints by resolving them against `sourceurl`. An
-implementation MUST NOT synthesize a value the host did not advertise.
+reconstruct the upstream endpoints. An implementation MUST NOT synthesize a
+value the host did not advertise.
 
 ### 5.2. Independence of the Two Collections
 
@@ -512,7 +512,7 @@ the collection name, is `providers`.
 | `type` | `string` | The provider type identifier, e.g. `aws`. |
 | `source` | `string` | The canonical `namespace/type` source address. |
 | `description` | `string` | Human-readable description of the provider. |
-| `sourceurl` | `url` | Base URL of the upstream registry. Provenance only. |
+| `registryhost` | `string` | The upstream registry host. |
 | `published_at` | `timestamp` | Publication time of the release. OPTIONAL public-registry extension; the provider registry protocol does not return it. |
 | `protocols` | `array` of `string` | Plugin protocol versions declared for the release, e.g. `["5.0"]`. |
 
@@ -649,7 +649,7 @@ collection name, is `modules`.
 | `provider` | `string` | The provider system the module targets, e.g. `aws`. |
 | `source_address` | `string` | The canonical `namespace/name/provider` source address, as written in a Terraform `module` block. |
 | `source` | `uri` | The module's **repository URL**, returned verbatim in the upstream `source` field, e.g. `https://github.com/hashicorp/terraform-aws-consul`. |
-| `sourceurl` | `url` | Base URL of the upstream registry. Provenance only. |
+| `registryhost` | `string` | The upstream registry host. |
 | `download_url` | `uri` | The module package source address from the `X-Terraform-Get` response header; see [Section 7.2](#72-retrieving-the-module-package). |
 | `published_at` | `timestamp` | RFC 3339 timestamp at which the Version was published. |
 | `providers` | `array` of `string` | The provider systems for which a module of this name exists in this namespace. |

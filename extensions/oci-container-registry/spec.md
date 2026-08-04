@@ -276,7 +276,7 @@ adheres to this form:
 
           "metaurl": "<URL>",
           "meta": {                             # see 6.8
-            "sourceurl": "<URL>", ?            # base URL actually fetched from
+            "registry": "<STRING>", ?           # registry actually fetched from
             "namespace": "<STRING>", ?          # org component of the repo name
             "repository": "<STRING>", ?         # repo component of the repo name
             "deprecated_message": "<STRING>", ? # registry-proprietary
@@ -350,8 +350,8 @@ conflated.
 Access control is a property of the registry deployment rather than of the
 identifier. A server MAY omit Groups or entries the caller is not entitled to
 see; a caller MUST NOT infer from an absence that the registry or repository
-does not exist. The `sourceurl` meta attribute on a Resource records the base
-URL that image was fetched from, which for a mirrored image is the mirror rather
+does not exist. The `registry` meta attribute on a Resource records the registry
+that image was fetched from, which for a mirrored image is the mirror rather
 than the named registry; where it is present it MUST be consistent with the
 service that actually served the content.
 
@@ -703,7 +703,7 @@ describe the image as a whole and do not vary between tags:
 
 | Meta attribute | Type | Description |
 |---|---|---|
-| `sourceurl` | `url` | Base URL of the OCI Distribution API this image was actually fetched from. Provenance only. |
+| `registry` | `string` | The registry this image was actually fetched from. Provenance only. |
 | `namespace` | `string` | The namespace or organization component of the repository name. |
 | `repository` | `string` | The repository component of the repository name. |
 | `pulled` | `uinteger` | Number of times the image has been pulled, across all tags. Registry-proprietary and OPTIONAL. |
