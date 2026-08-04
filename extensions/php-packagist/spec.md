@@ -312,7 +312,7 @@ Tagged releases are immutable; `immutable` MUST be `true` for them.
 ### 4.4. Branch Alias Version Identity
 
 A `dev-*` branch alias does not identify fixed content: the same alias resolves
-to different commits over time. Its identity must therefore incorporate both the
+to different commits over time. Its identity therefore has to incorporate both the
 alias and the source reference it currently denotes.
 
 The `versionid` for a branch alias MUST be constructed as:
@@ -415,7 +415,7 @@ because each has different resolver semantics:
 | `conflict` | `map` of `string` | Versions of other packages that MUST NOT be installed alongside this one. |
 | `replace` | `map` of `string` | Packages this one replaces; installing this satisfies those names. |
 | `provide` | `map` of `string` | Virtual package names this package implements. |
-| `suggest` | `map` of `string` | Optional packages recommended but not installed. |
+| `suggest` | `map` of `string` | Packages suggested to the consumer but not installed. |
 
 All six carry the upstream `composer.json` field name verbatim, including the
 hyphen in `require-dev`. `-` is a legal character in an xRegistry extension

@@ -51,7 +51,7 @@ specification restates it normatively for its own ecosystem.
 
 An Entity ID is limited to the [RFC3986 `unreserved`
 characters](https://datatracker.ietf.org/doc/html/rfc3986#section-2.3) (ALPHA,
-DIGIT, `-`, `.`, `_`, `~`) plus `:` and `@`, must start with ALPHA, DIGIT or
+DIGIT, `-`, `.`, `_`, `~`) plus `:` and `@`, starts with ALPHA, DIGIT or
 `_`, and is at most 128 characters. Two consequences drive every mapping in this
 directory:
 
@@ -65,7 +65,7 @@ directory:
   `artifactId`s and crate names.
 
 Crucially, an Entity ID does **not** need to be reversible. xRegistry Core
-notes that a `<SINGULAR>id` may be "something that isn't human friendly, like a
+notes that a `<SINGULAR>id` can be "something that isn't human friendly, like a
 UUID", and carries the readable value in `name` instead. Every extension here
 therefore preserves the exact upstream identifier verbatim in `name` (or in a
 named ecosystem attribute such as `version`), and requires consumers addressing
@@ -74,21 +74,21 @@ the origin registry to read that attribute rather than decode an identifier.
 Two corollaries follow, and both are binding on every extension in this
 directory:
 
-- **The authoritative name is REQUIRED, not optional.** Core leaves `name`
+- **The authoritative name is REQUIRED, not OPTIONAL.** Core leaves `name`
   OPTIONAL, but an identifier that cannot be reversed is useless without it, so
   each extension redeclares its authoritative name attribute as `required`.
   Without that, a projection could omit the only verbatim copy of the upstream
   name and still be valid. Where Core `name` is already bound to an upstream
   *display* name — Maven's `project/name`, which is prose such as "Apache
   Commons Lang" and not the `artifactId` — the ecosystem attributes carrying
-  identity (`group_id`, `artifact_id`) are the ones marked required instead.
+  identity (`group_id`, `artifact_id`) are the ones marked `required` instead.
 - **`name` names the Resource, never the Version string.** Core defines a single
   `name` per entity, so an extension cannot bind `name` to the Resource's
   package name and to the version string on the Version; one silently overwrites
   the other. The verbatim upstream version therefore always lives in a named
   attribute — `version`, `num` or `versionnormalized` — and never in `name`.
 
-An identifier must only be **deterministic, stable and collision-free**. Freed
+An identifier need only be **deterministic, stable and collision-free**. Freed
 from reversibility, the extensions derive identifiers in this order of
 preference:
 
@@ -137,7 +137,7 @@ to put disagreement and change:
 
 Access control is a property of the registry deployment rather than of the
 identifier. A registry serving only a private feed still serves it under the
-same Group, and may omit entries the caller is not entitled to see; absence is
+same Group, and can omit entries the caller is not entitled to see; absence is
 not evidence that an artifact does not exist upstream.
 
 OCI container registries are the exception, and deliberately so. An OCI
@@ -176,7 +176,7 @@ version string carries no reliable order.
 **Mutability.** Most package versions are immutable once published. OCI tags and
 Hugging Face branches are not. Where a Version identity is mutable, the
 specification says so explicitly and names the immutable content identity
-(a digest or commit SHA) that a consumer must pin to instead.
+(a digest or commit SHA) to pin to instead.
 
 **Cross-registry references.** The
 [mcp-server-registry](mcp-server-registry/spec.md) extension links MCP server

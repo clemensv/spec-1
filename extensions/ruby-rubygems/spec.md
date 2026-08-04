@@ -49,7 +49,7 @@ The distinguishing characteristic of RubyGems is that a single version number
 can correspond to several published builds differing only by *platform* — for
 example `nokogiri 1.19.4` exists as a pure-Ruby build, as a JRuby (`java`)
 build, and as several precompiled native builds, eleven platforms in all under
-one version number. Version identity must therefore incorporate the platform,
+one version number. Version identity therefore has to incorporate the platform,
 which [Section 4.3](#43-version-identity-and-platform-builds) addresses.
 
 ## 2. Notations and Terminology
@@ -261,7 +261,7 @@ attribute records which service each Group's entries were projected from.
 
 The `packageid` MUST be the gem name. RubyGems names are restricted to ASCII
 letters, digits, `-`, `_` and `.`, all of which are valid xRegistry Entity ID
-characters, so no encoding is required.
+characters, so no encoding is needed.
 
 Gem names are case-sensitive for lookup, consistent with xRegistry Core Entity
 ID rules. A `packageid` that differs from the canonical gem name only by case
@@ -295,7 +295,7 @@ platform: the RubyGems compact index encodes a release as `VERSION[-PLATFORM]`
 and omits the platform exactly when it is `ruby`. This specification follows
 that rule so that identity is not invented here.
 
-No other platform may be collapsed. In particular `java`, the JRuby build
+No other platform is collapsed. In particular `java`, the JRuby build
 platform, MUST NOT be collapsed: it is an ordinary non-default platform that
 coexists with `ruby` under the same version number. `nokogiri 1.19.4`, for
 example, is published for eleven platforms including both `ruby` and `java`, so
@@ -357,7 +357,7 @@ the collection name, is `packages`.
 | `info` | `string` | `info` | The gemspec **`summary`**: a one-line summary. The JSON API returns the summary under the name `info`; it is not the gemspec `description`. |
 | `description` | `string` | `description` | The gemspec **`description`**: the long-form description. The API returns it separately from `info`, and the two are distinct fields. |
 | `authors` | `string` | `authors` | Authors as a single comma-separated string, preserved in the upstream form. |
-| `licenses` | `array` of `string` | `licenses` | The declared license list. The field is **nullable**: a gem may declare no licenses, in which case the attribute is absent. RubyGems **recommends** but does not enforce SPDX; each entry is a free-form short license name of at most 64 characters, and `LicenseRef-` values are permitted. Consumers MUST NOT assume an entry is a valid SPDX identifier. |
+| `licenses` | `array` of `string` | `licenses` | The declared license list. The field is **nullable**: a gem can declare no licenses, in which case the attribute is absent. RubyGems **recommends** but does not enforce SPDX; each entry is a free-form short license name of at most 64 characters, and `LicenseRef-` values are permitted. Consumers MUST NOT assume an entry is a valid SPDX identifier. |
 | `version` | `string` | `version` | The latest stable version of the gem. |
 | `gem_uri` | `string` | `gem_uri` | Direct download URL for the `.gem` file. |
 | `platform` | `string` | `platform` | Build platform of the release. |
@@ -470,7 +470,7 @@ the gem as a whole rather than any single Version:
 
 | xRegistry attribute | Type | Description |
 |---|---|---|
-| `owners` | `array` of `object` | The users who may push the gem, each with a `handle` and a `role` of `owner` or `maintainer`. |
+| `owners` | `array` of `object` | The users entitled to push the gem, each with a `handle` and a `role` of `owner` or `maintainer`. |
 | `project_uri` | `string` | The gem's page on the registry. Synthesized by the registry from the gem name, not declared by the publisher. |
 | `downloads` | `integer` | Cumulative download count across all versions and platforms. |
 | `reverse_dependencies` | `array` of `string` | Names of gems that declare a dependency on this gem. |
@@ -481,7 +481,7 @@ through the ownership API, and ownership appears nowhere in the gem's own
 metadata document. Ownership is therefore neither single-valued nor part of the
 gem's identity, so it cannot partition the name space: gem names are flat and
 globally unique on RubyGems.org regardless of who owns them. The same holds for
-RubyGems Organizations, which may hold gems but do not appear in gem names.
+RubyGems Organizations, which can hold gems but do not appear in gem names.
 
 `reverse_dependencies` is taken from
 `GET /api/v1/gems/<gem>/reverse_dependencies.json`. It is an aggregate computed

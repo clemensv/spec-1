@@ -43,7 +43,7 @@ xRegistry document format and API [specification][xRegistry Core].
 ## 1. Overview
 
 An OCI registry stores content-addressed *blobs* organized into *repositories*
-and addressed by *manifests*. A manifest may describe a single-platform image or
+and addressed by *manifests*. A manifest can describe a single-platform image or
 be an *index* referencing several platform-specific manifests.
 
 This specification maps that model into xRegistry: a registry endpoint is a
@@ -393,9 +393,10 @@ the same value for consumers that address the two components independently.
 
 ### 4.3. Version Identity
 
-The `versionid` MUST be the OCI tag. OCI tags are restricted to
-`[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}`, all of which are valid xRegistry Entity ID
-characters within the permitted length, so no encoding is required.
+The `versionid` MUST be the OCI tag. An OCI tag begins with a character drawn
+from `[a-zA-Z0-9_]` and continues with at most 127 further characters drawn
+from `[a-zA-Z0-9._-]`, all of which are valid xRegistry Entity ID characters
+within the permitted length, so no encoding is needed.
 
 A tag is mutable: pushing to an existing tag repoints it at a new manifest
 without changing the tag. Implementations MUST NOT report a tag Version as

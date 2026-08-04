@@ -327,9 +327,9 @@
                     "type": "string",
                     "description": "The scope of the dependency (e.g., compile, test, provided)."
                   },
-                  "optional": {
+                  "is_optional": {
                     "type": "boolean",
-                    "description": "Whether this dependency is optional, from the POM 'optional' element."
+                    "description": "Whether this dependency is marked as optional, from the POM 'optional' element."
                   },
                   "system_path": {
                     "type": "string",
@@ -398,9 +398,9 @@
                     "type": "string",
                     "description": "The scope this declaration imposes (e.g., compile, test, provided, import)."
                   },
-                  "optional": {
+                  "is_optional": {
                     "type": "boolean",
-                    "description": "The optional flag this declaration imposes."
+                    "description": "The POM 'optional' flag this declaration imposes."
                   },
                   "system_path": {
                     "type": "string",

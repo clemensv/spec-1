@@ -50,7 +50,7 @@ implementations produce interoperable documents.
 
 The Group is the scope rather than the registry host because the scope is the
 only part of npm's model that partitions the name space: a scope exists
-precisely so that two publishers may use the same package name without
+precisely so that two publishers can use the same package name without
 conflict. The registry host does not participate in package identity — npm
 packuments are registry-agnostic, and selecting a registry is client
 configuration (`.npmrc`) rather than a property of the package — so a Group
@@ -354,7 +354,7 @@ attributes declared in [`model.json`](model.json).
 | `dependencies` | `array` of `object` | `dependencies` | Runtime dependencies, see [6.2](#62-dependency-cross-references). |
 | `dev_dependencies` | `array` of `object` | `devDependencies` | Development-time dependencies. |
 | `peer_dependencies` | `array` of `object` | `peerDependencies` | Peer dependencies. |
-| `optional_dependencies` | `array` of `object` | `optionalDependencies` | Optional dependencies. |
+| `optional_dependencies` | `array` of `object` | `optionalDependencies` | Dependencies whose installation failure is not fatal. |
 | `bundle_dependencies` | `array` of `object` | `bundleDependencies` | Dependencies bundled inside the published tarball. |
 | `replacedby` | `xid` | — | Cross-reference to the `package` Resource that supersedes this one, when a replacement has been identified. |
 

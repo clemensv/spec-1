@@ -83,7 +83,7 @@ published; publisher verification is performed by the registry.
 packaging conventions, always expressed as a granted total out of a maximum
 obtainable under the scoring model in force at the time of computation.
 
-**retracted**: A per-*version* marker indicating that version should no longer
+**retracted**: A per-*version* marker indicating that version is no longer to
 be selected, while remaining downloadable for existing pubspec locks.
 
 **discontinued**: A per-*package* marker indicating the maintainers no longer
@@ -290,7 +290,7 @@ from.
 
 The `packageid` MUST be the package name. Dart package names are lowercase
 identifiers composed of ASCII letters, digits and `_`, all of which are valid
-xRegistry Entity ID characters, so no encoding is required.
+xRegistry Entity ID characters, so no encoding is needed.
 
 ### 4.3. Version Identity
 
@@ -417,11 +417,11 @@ and the raw pubspec disagree, the raw pubspec is authoritative.
 to `keywords`, because doing so would misrepresent it. It is a controlled
 vocabulary closer to crates.io categories than to npm keywords:
 
-- at most 5 topics MAY be declared;
-- each topic is 2 to 32 characters long;
-- each consists of lowercase ASCII letters, digits and hyphens, MUST begin with
+- At most 5 topics MAY be declared;
+- Each topic is 2 to 32 characters long;
+- Each consists of lowercase ASCII letters, digits and hyphens, MUST begin with
   a letter and MUST end with a letter or digit;
-- the registry maintains a canonical set and MAY merge alternative spellings
+- The registry maintains a canonical set and MAY merge alternative spellings
   onto a canonical topic, so the projected value MAY differ from the literal
   text in the publisher's pubspec.
 
@@ -459,12 +459,12 @@ SDKs while requiring a narrow Flutter range, or require no Flutter at all.
 section is a mapping whose values are conventionally null and are reserved for
 future per-platform configuration. Projecting it as a list of names would
 discard that structure and would misrepresent a mapping as a sequence. The item
-type is `any` so that a non-null value, should one appear, survives.
+type is `any` so that a non-null value, if one appears, survives.
 
 `declared_platforms` MUST NOT be conflated with `detected_platforms`
 ([Section 6.7](#67-meta-attributes)). The former is what the publisher asserts;
 the latter is what the registry's static analysis concluded. They routinely
-disagree — a package that declares nothing may be detected as supporting every
+disagree — a package that declares nothing can be detected as supporting every
 platform, and a package that declares support the analyzer cannot confirm will
 not be tagged for it. An implementation MUST NOT derive either from the other.
 
@@ -526,7 +526,7 @@ object. Both forms are projected onto one object shape discriminated by
   applicable only when `source` is `hosted` and the dependency resolves within a
   registry covered by this projection; it MUST be omitted when `hosted_url`
   points at a registry that is not.
-- `dev_dependencies` are required only to develop and test the package itself
+- `dev_dependencies` are needed only to develop and test the package itself
   and MUST NOT be treated as transitive requirements of consumers.
 - `dependency_overrides` apply only when the package is the *root* of a
   resolution and are ignored when it is consumed as a dependency. Consumers MUST
@@ -587,7 +587,7 @@ and a projection that merges them is wrong in both directions.
   discontinued.
 - `replaced_by` is meaningful only when `is_discontinued` is true, and is
   OPTIONAL even then. It is the bare package name; an implementation MUST NOT
-  substitute a URL or an `xid` for it, because the named package may not exist
+  substitute a URL or an `xid` for it, because the named package might not exist
   in the projection.
 
 An implementation MUST NOT set `is_discontinued` from any version's `retracted`

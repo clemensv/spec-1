@@ -1,7 +1,7 @@
 # Model Context Protocol Server Registry Mapping - Version 1.0-rc1
 <!-- words: additionalproperties containerregistries dnx dotnetregistries -->
 <!-- words: environmentvariables filepath homepage islatest isrepeated -->
-<!-- words: isrequired issecret lifecycles lowercasing mcp mcpb mcpprovider -->
+<!-- words: issecret lifecycles lowercasing mcp mcpb mcpprovider -->
 <!-- words: mcpproviderid mcpproviders mcpproviderscount mcpprovidersurl -->
 <!-- words: mimetype modelcontextprotocol namespace nodescopes npx nuget -->
 <!-- words: packagearguments packagexid publishedat pypi pythonregistries -->
@@ -89,7 +89,7 @@ Context Protocol.
 **runtime hint**: An indication of the launcher expected to run the package,
 such as `npx`, `uvx`, `docker` or `dnx`.
 
-**input**: A value the operator must supply at launch — a command-line argument,
+**input**: A value the operator has to supply at launch — a command-line argument,
 an environment variable or an HTTP header.
 
 ## 3. Registry Model
@@ -101,7 +101,7 @@ one Resource type, `servers`, with `hasdocument` `false`, `maxversions` of `0`,
 
 `maxversions` is `0`, meaning unlimited. An MCP registry is an archival record
 of what was published; truncating it would silently discard entries that a
-consumer may still be pinned to.
+consumer might still be pinned to.
 
 This extension does not constrain `defaultversionsticky`. The publisher
 designates which release is current, so a server implementation is expected to
@@ -288,7 +288,7 @@ The `serverid` MUST be derived from the portion of the MCP server name that
 follows the single `/` separator, which is the server name within its
 namespace. The namespace preceding the `/` becomes the `mcpproviderid`. This
 splits the upstream name at its one structural separator and requires no
-escaping, because neither part may itself contain a `/`.
+escaping, because neither part can itself contain a `/`.
 
 Where the resulting `serverid` would exceed 128 characters, or contains a
 character outside the xRegistry Entity ID character set, the `serverid` MUST
@@ -406,7 +406,7 @@ collection name, is `servers`.
 | `publisher_meta` | `map` of `any` | `_meta` | no | Publisher-supplied metadata, see [6.7](#67-publisher-provided-metadata). |
 
 The REQUIRED column reflects the upstream `server.json` schema. `name`,
-`description` and `version` are required there and are therefore declared
+`description` and `version` are mandatory there and are therefore declared
 `required` in [`model.json`](model.json), overriding the OPTIONAL default that
 [xRegistry Core][xRegistry Core] gives `name` and `description`.
 
@@ -536,7 +536,7 @@ server is reached:
 ```yaml
 {
   "type": "STRING",     # stdio | streamable-http | sse
-  "url": "URL" ?,       # required for streamable-http and sse
+  "url": "URL" ?,       # needed for streamable-http and sse
   "headers": [ ... ]    # input descriptors, see 6.4
 }
 ```

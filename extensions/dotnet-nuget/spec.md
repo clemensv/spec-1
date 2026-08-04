@@ -288,7 +288,7 @@ attribute records which service each Group's entries were projected from.
 
 The `packageid` MUST be the NuGet package ID, lowercased. NuGet package IDs are
 restricted to ASCII letters, digits, `.`, `-` and `_`, all of which are valid
-xRegistry Entity ID characters, so no encoding is required.
+xRegistry Entity ID characters, so no encoding is needed.
 
 NuGet treats package IDs case-insensitively while xRegistry Entity ID lookup is
 case-sensitive, so a canonical casing MUST be chosen. That casing MUST be the
@@ -305,7 +305,7 @@ declared it.
 ### 4.3. Version Identity
 
 The `versionid` MUST be derived from the package version string. NuGet versions
-follow [SemVer 2.0.0][semver] with an optional fourth "revision" component.
+follow [SemVer 2.0.0][semver], extended with a fourth "revision" component.
 
 `+` is not a valid xRegistry Entity ID character, so each `+` in a version
 containing build metadata MUST be replaced by `~`, giving `1.0.0~build.5` for
@@ -426,10 +426,10 @@ the collection name, is `packages`.
 | `readme_url` | `url` | `readmeUrl` | URL of the rendered README document. |
 | `license_url` | `url` | `licenseUrl` | URL of the license document. Deprecated upstream. |
 | `license_expression` | `string` | `licenseExpression` | SPDX license expression declared by the package. |
-| `require_license_acceptance` | `boolean` | `requireLicenseAcceptance` | Whether the license must be accepted before installation. |
+| `require_license_acceptance` | `boolean` | `requireLicenseAcceptance` | Whether the license has to be accepted before installation. |
 | `project_url` | `url` | `projectUrl` | Project homepage URL. |
 | `package_content` | `url` | `packageContent` | URL of the `.nupkg` artifact for this version. |
-| `min_client_version` | `string` | `minClientVersion` | Minimum NuGet client version required. |
+| `min_client_version` | `string` | `minClientVersion` | Minimum NuGet client version needed. |
 | `listed` | `boolean` | listing state | Whether the version is visible to search, see [6.4](#64-listing-state-and-publication). |
 | `published` | `timestamp` | `published` | Upstream publication value, see [6.4](#64-listing-state-and-publication). |
 | `package_types` | `array` of `object` | `packageTypes` | Declared package types, see below. |
@@ -474,8 +474,8 @@ is normalized:
   MUST NOT be split.
 
 `package_types` carries the upstream `packageTypes` array; each entry has a
-`name`, typically `Dependency`, `DotnetTool` or `Template`, and an optional
-`version`. NuGet treats a package that declares no package type as a
+`name`, typically `Dependency`, `DotnetTool` or `Template`, and a `version`
+that can be absent. NuGet treats a package that declares no package type as a
 `Dependency` package, but an implementation MUST omit `package_types` rather
 than synthesize that default.
 
@@ -559,7 +559,7 @@ follow the same convention as the single-word members `name`, `range` and
 A NuGet version MAY be *unlisted*: it disappears from search results and from
 the package's version list on the gallery, but remains downloadable at its
 `package_content` URL for consumers that already reference it. Unlisting is the
-closest NuGet equivalent of a removal and is the state a consumer must know
+closest NuGet equivalent of a removal and is the state a consumer needs to know
 about in order to explain why a version cannot be discovered.
 
 | xRegistry attribute | Type | NuGet source | Description |
@@ -593,7 +593,7 @@ it is projected as the `deprecation` object:
 {
   "reasons": [ "STRING" * ], ?     # Legacy | CriticalBugs | Other | ...
   "message": "STRING", ?           # owner-supplied free text
-  "alternate_package": {           # recommended replacement
+  "alternate_package": {           # suggested replacement
     "id": "STRING", ?
     "range": "STRING", ?           # NuGet interval notation, "*" = any
     "package": "XID" ?             # -> /dotnetregistries/packages

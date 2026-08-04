@@ -89,7 +89,7 @@ every module version, allowing tampering to be detected.
 semantic version tag. It encodes a UTC timestamp and a commit prefix.
 
 **retraction**: A `retract` directive in a later `go.mod` declaring that a
-range of earlier versions of the same module should not be selected.
+range of earlier versions of the same module is not to be selected.
 
 **dirhash**: The `h1:` hash form recorded in `go.sum` and in the checksum
 database: the base64 SHA-256 of a canonically formatted listing of the file
@@ -414,7 +414,7 @@ example.com/m        and        example.com/m/v2
 ```
 
 are **distinct modules**, not two version ranges of one module. They have
-distinct module paths, distinct import paths, may be built into the same binary
+distinct module paths, distinct import paths, can be built into the same binary
 simultaneously, and have independent version streams.
 
 This extension MUST therefore represent them as **distinct `module` Resources**.
@@ -511,7 +511,7 @@ SHOULD use that timestamp when ordering versions chronologically, since a
 pseudo-version's SemVer precedence is deliberately low.
 
 `+incompatible` marks a major version at or above `v2` that was published from a
-repository whose module path does **not** carry the required `/vN` suffix. Go
+repository whose module path does **not** carry the expected `/vN` suffix. Go
 accepts such a version under the unsuffixed module path, on the assumption that
 the repository predates module support, and appends `+incompatible` as SemVer
 build metadata to record that the module-path rule was not satisfied. The suffix
@@ -565,8 +565,8 @@ and is meaningful only in the main module.
 in the build list but none of its packages are imported directly. These are
 **minimum** versions consumed by minimal version selection, not pinned versions.
 
-**`replace`** entries carry `old_path`, optional `old_version`, `new_path` and
-optional `new_version`. `old_version` is absent when the directive replaces all
+**`replace`** entries carry `old_path`, `old_version`, `new_path` and
+`new_version`. `old_version` is absent when the directive replaces all
 versions of the module; `new_version` is absent when the replacement target is a
 local filesystem directory.
 
@@ -593,7 +593,7 @@ file tree.
 
 Retraction in Go is **not a flag on a version**. It is a `retract` directive,
 declared in the `go.mod` of a *later* version of the same module, naming a
-**range** of versions that should not be selected:
+**range** of versions that are not to be selected:
 
 ```text
 retract v1.0.5                     // single version
@@ -606,13 +606,13 @@ retract (
 
 Three properties follow, and they are why a boolean cannot express this:
 
-1. Retraction is **range-valued**, not per-version. A single directive may
+1. Retraction is **range-valued**, not per-version. A single directive can
    retract versions that were never individually enumerated, including versions
    that do not exist.
 2. Retraction is **declared elsewhere**. The `go.mod` of a retracted version is
    immutable and contains no record of its own retraction; a Version therefore
    *cannot know* that it is retracted. The information arrives only from a later
-   version's `go.mod`, which a consumer must fetch separately.
+   version's `go.mod`, which a consumer has to fetch separately.
 3. Retraction can be **withdrawn** by publishing a further version that omits
    the directive, so the effective set is whatever the current highest
    non-retracted version declares — it is not cumulative history.
@@ -624,7 +624,7 @@ This extension models the two facts separately:
 | `retract` | Version | `array` of `object` | The `retract` directives *declared by* this Version's `go.mod`. |
 | `retractions` | Resource meta | `array` of `object` | The *effective* retracted ranges for the module. |
 
-Each `retract` entry carries `low`, `high` and optional `rationale`; `low`
+Each `retract` entry carries `low`, `high` and, where present, `rationale`; `low`
 equals `high` for a single-version retraction, and `rationale` is the comment
 recorded with the directive. Entries in `retractions` carry the same fields plus
 `declared_in`, the canonical Go version whose `go.mod` declared the range.

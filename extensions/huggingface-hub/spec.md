@@ -327,7 +327,7 @@ a dataset with the same basename; they are distinct Resources.
 
 Neither the Group ID nor the Resource ID ever contains `/`. Hub repository names
 are otherwise restricted to ASCII alphanumerics, `-`, `_` and `.`, all of which
-are valid Entity ID characters, so no encoding is required and percent-encoding
+are valid Entity ID characters, so no encoding is needed and percent-encoding
 never arises — which is fortunate, since `%` is itself not a valid Entity ID
 character. The canonical upstream identity is retained in `repoid`, `repository`
 and `name`, and consumers addressing the Hub itself MUST read `repoid`.
@@ -367,7 +367,7 @@ always has one resolvable default.
 
 Git commit SHAs are 40 hexadecimal characters, well within the xRegistry Entity
 ID length limit, and consist only of valid Entity ID characters, so no encoding
-is required.
+is needed.
 
 ### 4.5. Timestamps
 
@@ -387,7 +387,7 @@ carry exactly that meaning.
 | commit date | core `createdat` of the Version |
 
 All three are RFC 3339 timestamps, so no conversion beyond normalization to UTC
-is required.
+is needed.
 
 ## 5. Group: `huggingfaceregistry`
 
@@ -491,7 +491,7 @@ at machine-generated commits, so they belong beside `branches` and `tags` rather
 than being dropped.
 
 Branches, tags and conversions are deliberately *not* Versions. A reference
-moves; a Version identity must not. Placing them on the Meta entity keeps the
+moves; a Version identity does not. Placing them on the Meta entity keeps the
 Versions collection immutable while retaining the human-meaningful names.
 
 ### 6.4. File Manifest
@@ -533,7 +533,7 @@ collection name, is `models`. It carries the common attributes of
 |---|---|---|---|
 | `downloads` | `downloads` | `uinteger` | Download count as anonymously visible. |
 | `pipeline_tag` | `pipeline_tag` | `string` | The primary machine-learning task, e.g. `text-generation`. |
-| `library_name` | `library_name` | `string` | The primary library required to load the model, e.g. `transformers`, `diffusers`. |
+| `library_name` | `library_name` | `string` | The primary library needed to load the model, e.g. `transformers`, `diffusers`. |
 | `config` | `config` | `object` | Model configuration summary, e.g. `architectures`, `model_type`. Open-ended, admitted through a wildcard attribute. |
 | `transformers_info` | `transformersInfo` | `object` | Transformers auto-class information: `auto_model`, `pipeline_tag`, `processor`. |
 | `safetensors` | `safetensors` | `object` | Weight summary: `parameters`, a map of dtype to count, and `total`. |

@@ -278,7 +278,7 @@ from.
 
 The `packageid` MUST be the project name as served by the index. PyPI project
 names consist of ASCII letters, digits, `-`, `_` and `.`, all of which are valid
-in an xRegistry Entity ID, so no encoding is required.
+in an xRegistry Entity ID, so no encoding is needed.
 
 Because PyPI treats project names as equivalent under normalization while
 xRegistry Entity ID lookup is case-sensitive, implementations MUST choose one
@@ -360,7 +360,7 @@ replaced by `_`, which is also the form used by the PyPI JSON API.
 | `description_content_type` | `string` | `Description-Content-Type` | Media type of the long description, e.g. `text/markdown`. |
 | `requires_python` | `string` | `Requires-Python` | PEP 440 specifier constraining the interpreter version. |
 | `classifiers` | `array` of `string` | `Classifier` | Trove classifiers categorizing the project. |
-| `provides_extra` | `array` of `string` | `Provides-Extra` | Names of optional feature sets ("extras"). |
+| `provides_extra` | `array` of `string` | `Provides-Extra` | Names of the feature sets ("extras") the project defines. |
 | `platform` | `string` | `Platform` | Platform compatibility statement. Projects the JSON API's `platform` field, not the `Platform` metadata field directly; see below. |
 | `dynamic` | `array` of `string` | `Dynamic` | Fields computed at build time rather than declared statically. |
 | `description` | `string` | `Description` | Long description of the project. This is the xRegistry Core `description` attribute; this extension does not redefine it. |

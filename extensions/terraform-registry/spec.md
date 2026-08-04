@@ -613,8 +613,8 @@ the provider as a whole rather than any single release.
 
 Every attribute in this section is an OPTIONAL user-interface extension of the
 public Terraform Registry. None of them is part of the provider registry
-protocol. The protocol is explicit that third-party implementations should not
-include these extensions, because they may change in future without notice. A
+protocol. The protocol is explicit that third-party implementations are not to
+include these extensions, because they can change in future without notice. A
 third-party host therefore SHOULD NOT populate them, and a consumer MUST NOT
 require them, MUST tolerate their absence, and MUST NOT make trust or resolution
 decisions depend on them.
@@ -705,7 +705,7 @@ repository URL is not the package location.
 
 ### 7.3. Module Interface Contract
 
-`root` describes the module's callable interface — what a caller must supply,
+`root` describes the module's callable interface — what a caller has to supply,
 what it gets back, and what the module in turn requires. `submodules` carries
 the same structure for each nested module published in the package. Both share
 this shape:
@@ -723,7 +723,7 @@ this shape:
 | `resources` | `array` of `object` | Resources and data sources declared: `name`, `type`. |
 
 `inputs[].default` carries the JSON encoding of the default value, because a
-Terraform default may be of any type. An input with `required` true has no
+Terraform default can be of any type. An input with `required` true has no
 default and MUST be supplied by the caller; `required` and the presence of
 `default` are therefore complementary, and an implementation MUST NOT report an
 input as both.

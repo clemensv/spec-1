@@ -109,7 +109,7 @@ the [model.json](model.json) file. It declares one Group type,
 `javanamespaces`, and one Resource type, `packages`.
 
 The `package` Resource sets `hasdocument` to `false`. A Maven release publishes
-several files — the main artifact, the POM, and optional classified artifacts
+several files — the main artifact, the POM, and any classified artifacts
 such as `sources` and `javadoc` — so there is no single Resource document.
 
 For easy reference, the JSON serialization of a Java Package Registry adheres
@@ -263,7 +263,7 @@ to this form:
               "classifier": "<STRING>", ?
               "type": "<STRING>", ?            # defaults to jar
               "scope": "<STRING>", ?           # compile, test, provided, ...
-              "optional": <BOOLEAN>, ?
+              "is_optional": <BOOLEAN>, ?
               "system_path": "<STRING>", ?     # only with scope system
               "exclusions": [
                 {
@@ -284,7 +284,7 @@ to this form:
               "classifier": "<STRING>", ?
               "type": "<STRING>", ?            # pom + scope import = BOM
               "scope": "<STRING>", ?
-              "optional": <BOOLEAN>, ?
+              "is_optional": <BOOLEAN>, ?
               "system_path": "<STRING>", ?
               "exclusions": [
                 {
@@ -318,7 +318,7 @@ The `javanamespaceid` MUST be the Maven `groupId` verbatim, for example
 
 A `groupId` is directly usable as an xRegistry Entity ID: it is constrained to
 ASCII letters, digits, `-`, `_` and `.`, all of which are valid Entity ID
-characters, and it always begins with a letter. No encoding is required.
+characters, and it always begins with a letter. No encoding is needed.
 
 A `groupId` MAY exceed the 128-character Entity ID limit only in pathological
 cases. An implementation that encounters such a `groupId` MUST NOT truncate it;
@@ -493,7 +493,7 @@ implementation states which POM they came from. It MUST do so:
   `profiles` it activated, because profile activation depends on the build
   environment and a consumer cannot otherwise reproduce the result.
 
-Since `pom_resolution` is not required to be constant across a Resource's
+Since `pom_resolution` need not be constant across a Resource's
 Versions, a consumer MUST read it per Version.
 
 `parent` carries the POM `project/parent` element:
@@ -531,9 +531,9 @@ Implementations MUST NOT collapse it to a single SPDX expression, since the POM
 does not define the boolean relationship between multiple licenses.
 
 `licenses[].distribution` carries the POM `license/distribution` element, which
-states how the artifact may legally be distributed. Maven documents the values
-`repo` — the artifact may be downloaded from a Maven repository — and `manual`
-— the user must obtain the artifact by hand. The element is not restricted to
+states how the artifact can legally be distributed. Maven documents the values
+`repo` — the artifact can be downloaded from a Maven repository — and `manual`
+— the user has to obtain the artifact by hand. The element is not restricted to
 those two values, so an implementation MUST preserve any other value verbatim
 and MUST NOT reject or normalize it. `distribution` MUST NOT be inferred: an
 absent element MUST be projected as an absent field, because `repo` is not a
@@ -635,7 +635,7 @@ Each entry of `dependencies` has the following shape:
   "classifier": "STRING" ?,
   "type": "STRING" ?,              # defaults to jar
   "scope": "STRING",               # compile | provided | runtime | test | system | import
-  "optional": BOOLEAN ?,
+  "is_optional": BOOLEAN ?,
   "system_path": "STRING" ?,       # only with scope system
   "exclusions": [
     { "group_id": "STRING" ?, "artifact_id": "STRING" ? } *
@@ -653,7 +653,7 @@ Each entry of `dependencies` has the following shape:
 - `package` is an `xid` targeting `/javanamespaces/packages`. It MUST reference
   the Resource, and MUST be present only when that Resource exists in this
   Registry.
-- `optional` mirrors the POM `<optional>` flag; a dependency marked optional is
+- `is_optional` mirrors the POM `optional` element; a dependency so marked is
   not transitively propagated by Maven.
 - `system_path` mirrors the POM `<systemPath>` element, which is valid only when
   `scope` is `system`. It is an absolute path on the publisher's build machine,
@@ -706,7 +706,7 @@ shape as `dependencies` entries minus `resolved_version`, `managed` and
   "classifier": "STRING" ?,
   "type": "STRING" ?,              # pom, together with scope import, is a BOM
   "scope": "STRING" ?,             # compile | provided | runtime | test | system | import
-  "optional": BOOLEAN ?,
+  "is_optional": BOOLEAN ?,
   "system_path": "STRING" ?,
   "exclusions": [
     { "group_id": "STRING" ?, "artifact_id": "STRING" ? } *
@@ -716,8 +716,8 @@ shape as `dependencies` entries minus `resolved_version`, `managed` and
 ```
 
 - An entry of `dependency_management` does NOT add a dependency to the project.
-  It supplies default `version`, `scope`, `exclusions` and `optional` values for
-  matching declarations in this POM and in every POM that inherits from it. An
+  It supplies default `version`, `scope`, `exclusions` and `is_optional` values
+  for matching declarations in this POM and in every POM that inherits from it. An
   implementation MUST NOT merge `dependency_management` entries into
   `dependencies`, and a consumer MUST NOT read them as dependencies.
 - An entry with `type` of `pom` and `scope` of `import` is a *BOM import*: it
@@ -741,7 +741,7 @@ An implementation conforms to this specification when:
 3. every attribute it populates carries the meaning assigned in
    [Section 6](#6-resource-package), and
 4. it populates `pom_resolution` whenever it populates any POM-derived
-   attribute, as required by [Section 6.2](#62-pom-inheritance-and-the-effective-pom).
+   attribute, as [Section 6.2](#62-pom-inheritance-and-the-effective-pom) requires.
 
 An implementation MAY expose additional extension attributes. An implementation
 MAY omit any attribute for which the POM supplies no value.

@@ -8,7 +8,7 @@
 ## Abstract
 
 This specification defines an xRegistry extension that expresses the content of
-[crates.io][crates.io], and any registry implementing the Cargo registry API, in
+crates.io, and any registry implementing the Cargo registry API, in
 terms of the xRegistry document format and API [specification][xRegistry Core].
 
 ## Table of Contents
@@ -281,7 +281,7 @@ service each Group's entries were projected from.
 
 The `crateid` MUST be the crate name. Cargo restricts crate names to ASCII
 letters, digits, `-` and `_`, all of which are valid xRegistry Entity ID
-characters, so no encoding is required.
+characters, so no encoding is needed.
 
 crates.io treats `-` and `_` as equivalent when checking for name collisions but
 does not merge such crates once published. Implementations MUST use the name
@@ -446,8 +446,8 @@ recorded digest verbatim rather than recomputing it. Consumers SHOULD verify a
 downloaded archive against `cksum` before use.
 
 `v` governs how the feature tables are interpreted. A consumer that does not
-recognise the value of `v` MUST refuse to use the index entry, as required by
-the Cargo index format, rather than degrading to a best-effort interpretation.
+recognise the value of `v` MUST refuse to use the index entry, as the Cargo index format
+requires, rather than degrading to a best-effort interpretation.
 
 ### 6.4. Features
 
@@ -471,9 +471,9 @@ following attributes.
 | Attribute | Type | Description |
 |---|---|---|
 | `name` | `string` | The name the dependency is referred to by in this crate. When the dependency was renamed this is the local alias. |
-| `req` | `string` | The Cargo SemVer requirement the dependency version must satisfy, for example `^1.0`. |
+| `req` | `string` | The Cargo SemVer requirement the dependency version has to satisfy, for example `^1.0`. |
 | `features` | `array` of `string` | The features of the dependency explicitly enabled by this crate. |
-| `optional` | `boolean` | Whether the dependency is optional. |
+| `optional` | `boolean` | Whether the dependency is pulled in only by a feature. |
 | `default_features` | `boolean` | Whether the default features of the dependency are enabled. |
 | `target` | `string` | The Cargo target expression gating the dependency, for example `cfg(windows)`. ABSENT when unconditional. |
 | `kind` | `string` | `normal`, `dev` or `build`. The enumeration is open. |
@@ -487,7 +487,7 @@ optionality.
 
 `name` and `package` MUST NOT be conflated. When `package` is present, `name` is
 the alias by which the crate's own source refers to the dependency, and
-`package` is the crate that must actually be resolved; an implementation that
+`package` is the crate that is actually resolved; an implementation that
 drops `package` produces an unresolvable dependency graph.
 
 Dependencies are Version-level. They are not reported on the crate object, and
@@ -504,7 +504,7 @@ sub-object.
 | `downloads` | `integer` | Cumulative all-time download count summed over every version. |
 | `recent_downloads` | `integer` | Download count over the trailing 90-day window. |
 | `num_versions` | `uinteger` | The number of published versions, including yanked ones. |
-| `trustpub_only` | `boolean` | Whether the crate may only be published through Trusted Publishing. |
+| `trustpub_only` | `boolean` | Whether the crate can be published only through Trusted Publishing. |
 | `crate_links` | `object` | The crates.io `CrateLinks` structure. |
 
 These values are registry-operator statistics rather than manifest data. They
@@ -584,7 +584,7 @@ ownership can change after publication whereas the publisher of a version
 cannot.
 
 Each `owners` element carries a `kind` of `user` or `team`; the enumeration is
-open so that registries implementing the Cargo API may define further owner
+open so that registries implementing the Cargo API can define further owner
 kinds.
 
 ## 7. Conformance
@@ -600,5 +600,4 @@ An implementation MAY expose additional extension attributes. An implementation
 MAY omit any attribute for which the upstream registry supplies no value.
 
 [xRegistry Core]: https://xregistry.io/xreg/xregistryspecs/core-v1/docs/spec.html
-[crates.io]: https://crates.io/
 [semver]: https://semver.org/
