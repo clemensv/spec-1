@@ -8,7 +8,7 @@ verify: spellcheck ticks badhrefs tabcheck errorcheck samplescheck hrefs \
 
 spellcheck:
 	@echo "Checking for spelling mistakes:"
-	tools/spellcheck */README.md */spec.md core/*.md \
+	tools/spellcheck */README.md */spec.md */*/spec.md core/*.md \
 		docs/share/README.md */samples/README.md */samples/*/README.md
 	@echo
 
@@ -34,7 +34,7 @@ errorcheck:
 
 samplescheck:
 	@echo "Check for too verbose samples:"
-	tools/samplescheck */model.json */samples/*json */samples/*/*json
+	tools/samplescheck */model.json */*/model.json */samples/*json */samples/*/*json
 	@echo
 
 hrefs:
@@ -64,11 +64,11 @@ models:
 	@# of 'xr' can be done
 	if which xr ; then \
 	  echo Using local xr ; \
-	  xr model verify */model.json -v ; \
+	  xr model verify */model.json */*/model.json -v ; \
 	else \
 	  echo Using docker ghcr.io/xregistry/xr ; \
 	  docker run -t -v $$PWD:/xreg -w /xreg --entrypoint /bin/sh \
-		ghcr.io/xregistry/xr -c "/xr model verify */model.json -v" ; \
+		ghcr.io/xregistry/xr -c "/xr model verify */model.json */*/model.json -v" ; \
 	fi
 	@echo
 

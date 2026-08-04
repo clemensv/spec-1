@@ -146,6 +146,7 @@ inlining
 interoperability
 interoperable
 isdefault
+isrequired
 javadoc
 json
 jsonpath
