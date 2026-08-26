@@ -616,14 +616,6 @@ Schema is `JsonStructure`. When the `format` attribute is set to `JsonStructure`
 the `schema` attribute of the schema Resource is a JSON object representing a JSON
 Structure schema document [JSTRUCT-CORE].
 
-A JSON Structure schema document MUST contain the REQUIRED top-level
-`$schema` keyword defined by [JSTRUCT-CORE]. Its value MUST be an absolute URI
-corresponding to the `$id` of the JSON Structure meta-schema to which the
-document conforms. The `$schema` keyword identifies the JSON Structure version
-and meta-schema; it does not import definitions into the document. The value is
-part of the schema document and is distinct from the xRegistry `format`
-attribute.
-
 The version identifier follows the pattern `JsonStructure/{version}`, where
 `{version}` is the version of the JSON Structure Core specification that is
 used to define the schema.
