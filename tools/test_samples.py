@@ -59,3 +59,44 @@ def test_sample_has_unique_keys(sample):
             yaml.load(sample_file, Loader=_UniqueKeyLoader)
         else:
             json.load(sample_file, object_pairs_hook=_unique_json_object)
+
+
+def test_contoso_crm_samples_use_current_model():
+    with (ROOT / "core" / "samples" / "contoso-crm.cereg").open(
+        encoding="utf-8"
+    ) as sample_file:
+        json_sample = json.load(sample_file, object_pairs_hook=_unique_json_object)
+    with (ROOT / "core" / "samples" / "contoso-crm.cereg.yaml").open(
+        encoding="utf-8"
+    ) as sample_file:
+        yaml_sample = yaml.load(sample_file, Loader=_UniqueKeyLoader)
+
+    assert json_sample == yaml_sample
+    assert "definitionGroups" not in json_sample
+    assert "schemaGroups" not in json_sample
+
+    endpoint = json_sample["endpoints"]["Contoso.CRM.Eventing.Http"]
+    assert endpoint["usage"] == ["producer"]
+    assert endpoint["messagegroups"] == ["/messagegroups/Contoso.CRM.Events"]
+    assert endpoint["protocoloptions"]["endpoints"] == [
+        {"uri": "https://erpsystem.com/events"}
+    ]
+
+    message_group = json_sample["messagegroups"]["Contoso.CRM.Events"]
+    assert len(message_group["messages"]) == 10
+    for message in message_group["messages"].values():
+        assert "id" not in message
+        assert "metadata" not in message
+        assert "schemaurl" not in message
+        assert message["envelopemetadata"]["time"]["type"] == "timestamp"
+        assert message["dataschemaformat"] == "JSONSchema/draft-07"
+        assert message["dataschemauri"].startswith(
+            "/schemagroups/Contoso.CRM.Events/schemas/"
+        )
+
+    schema_group = json_sample["schemagroups"]["Contoso.CRM.Events"]
+    assert len(schema_group["schemas"]) == 11
+    for schema in schema_group["schemas"].values():
+        assert schema["format"] == "JSONSchema/draft-07"
+        for version in schema["versions"].values():
+            assert version["format"] == schema["format"]
