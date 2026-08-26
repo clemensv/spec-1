@@ -38,7 +38,8 @@ def get_schema_draft(file_path):
         file_path (str): Path to the JSON file.
     
     Returns:
-        str: Detected JSON Schema draft version (e.g., "draft-07") or "unknown" if not found.
+        str or None: Detected JSON Schema draft version (e.g., "draft-07"),
+        or None if it cannot be identified.
     """
     try:
         with open(file_path, "r", encoding="utf-8") as f:
@@ -55,9 +56,9 @@ def get_schema_draft(file_path):
         elif "draft/2020-12" in schema_url:
             return "draft/2020-12"
         else:
-            return "unknown" if not schema_url else schema_url
-    except Exception as e:
-        return f"error: {e}"
+            return None
+    except Exception:
+        return None
 
 def group_files_by_base(directory):
     """
@@ -97,7 +98,8 @@ def build_registry(groups):
     """
     Constructs the registry document from the grouped file information.
     
-    Each version entry includes the "format" field set to "JSONSchema/Draft/<detected draft>".
+    Each version entry includes the "format" field when the JSON Schema draft
+    can be identified.
     
     Args:
         groups (dict): Grouped filenames with version and draft info.
@@ -118,13 +120,13 @@ def build_registry(groups):
     for base, versions in groups.items():
         version_entries = {}
         for ver, info in sorted(versions.items()):
-            # Capitalize the draft string (e.g. "draft-07" -> "Draft-07")
-            draft_cap = info["draft"].capitalize() if info["draft"] else "unknown"
-            version_entries[ver] = {
+            version_entry = {
                 "schemauri": BASE_URI + info["filename"],
-                "description": f"Schema for {info['filename']}",
-                "format": f"JSONSchema/{draft_cap}"
+                "description": f"Schema for {info['filename']}"
             }
+            if info["draft"]:
+                version_entry["format"] = f"JSONSchema/{info['draft'].capitalize()}"
+            version_entries[ver] = version_entry
         schemas[base] = {
             "versions": version_entries
         }
